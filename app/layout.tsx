@@ -6,7 +6,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <h4>butt</h4>
+        <h1 className="text-3xl font-bold underline">text-3xl font-bold underline</h1>
         {children}
       </body>
     </html>

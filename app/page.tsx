@@ -1,4 +1,5 @@
-import Counter from "./counter"
+import Counter from "./counter";
+import "@/styles/global.css";
 
 export const metadata = {
   title: 'App Router',
