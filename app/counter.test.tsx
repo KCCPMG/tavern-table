@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { fireEvent, render, screen } from '@testing-library/react'
-import Counter from './counter'
+import Counter from '../components/counter'
 
 it('App Router: Works with Client Components (React State)', () => {
   render(<Counter />)
