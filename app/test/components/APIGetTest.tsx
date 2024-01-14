@@ -18,7 +18,7 @@ export default function APIGetTest() {
 
   return (
     <h1>
-      API Get Test {data}
+      API Get Test: {data}
     </h1>
   )
 }
