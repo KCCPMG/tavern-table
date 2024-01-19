@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
   // console.log(pusher);
 
-  const response = await pusher.trigger("chat", "chat-event", {
+  const response = await pusher.trigger("my-channel", "my-event", {
     message,
     sender
   });

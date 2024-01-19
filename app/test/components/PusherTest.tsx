@@ -6,22 +6,21 @@ export default function PusherTest() {
 
   const [pusherData, setPusherData] = useState({})
 
-  // useEffect(() => {
-  //   fetch('/api/samplePusher', {
-  //     method: 'POST',
-  //     body: JSON.stringify({
-  //       message: "hello pusher",
-  //       sender: "its-a me"
-  //     })
-  //   })
-  //   .then(res => res.json())
-  //   .then(json => setPusherData(json));
-  // }, [])
 
   // Enable pusher logging - don't include this in production
   // Pusher.logToConsole = true;
 
   useEffect(() => {
+
+    fetch('/api/samplePusher', {
+      method: 'POST',
+      body: JSON.stringify({
+        message: "hello pusher",
+        sender: "its-a me"
+      })
+    })
+    .then(res => res.json())
+    .then(json => console.log(json));
 
     console.log(process.env.PUSHER_KEY, process.env.PUSHER_CLUSTER)
 
