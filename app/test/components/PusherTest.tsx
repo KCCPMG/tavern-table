@@ -1,34 +1,49 @@
 "use client"
 import { useEffect, useState } from "react";
-// import { pusherClient } from "@/lib/pusher";
+import Pusher from "pusher-js";
 
 export default function PusherTest() {
 
   const [pusherData, setPusherData] = useState({})
 
-  useEffect(() => {
-    fetch('/api/samplePusher', {
-      method: 'POST',
-      body: JSON.stringify({
-        message: "hello pusher",
-        sender: "its-a me"
-      })
-    })
-    .then(res => res.json())
-    .then(json => setPusherData(json));
-  }, [])
+  // useEffect(() => {
+  //   fetch('/api/samplePusher', {
+  //     method: 'POST',
+  //     body: JSON.stringify({
+  //       message: "hello pusher",
+  //       sender: "its-a me"
+  //     })
+  //   })
+  //   .then(res => res.json())
+  //   .then(json => setPusherData(json));
+  // }, [])
 
   // Enable pusher logging - don't include this in production
   // Pusher.logToConsole = true;
 
-  // var pusher = new Pusher('a1bb6b25bb513f4d5a0a', {
-  //   cluster: process.env.PUSHER_CLUSTER
-  // });
+  useEffect(() => {
 
-  // var channel = pusher.subscribe('my-channel');
-  // channel.bind('my-event', function(data) {
-  //   alert(JSON.stringify(data));
-  // });
+    console.log(process.env.PUSHER_KEY, process.env.PUSHER_CLUSTER)
+
+    // const pusher = new Pusher(process.env.PUSHER_KEY as string, {
+    //   cluster: process.env.PUSHER_CLUSTER as string
+    // });
+
+    const pusher = new Pusher("a1bb6b25bb513f4d5a0a", {
+      cluster: "us3"
+    });
+  
+    const channel = pusher.subscribe('my-channel');
+    channel.bind('my-event', function(data: any) {
+      const stringified = JSON.stringify(data);
+      setPusherData(stringified);
+      console.log(stringified);
+    });
+
+    return (() => {
+      pusher.unsubscribe('my-channel');
+    })
+  })
 
   return (
     <h1>
