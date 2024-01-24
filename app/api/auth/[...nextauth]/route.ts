@@ -5,7 +5,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 const options: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: "Crednetials",
+      name: "Credentials",
       credentials: {
         username: {
           label: "Username",
@@ -31,7 +31,14 @@ const options: NextAuthOptions = {
         }
       }
     })
-  ]
+  ],
+  secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",  // default, specify for clarity
+    maxAge: 24 * 60 * 60 // 24 hours
+  }
 }
 
-export default NextAuth(options);
+const handler = NextAuth(options);
+
+export {handler as GET, handler as POST};
