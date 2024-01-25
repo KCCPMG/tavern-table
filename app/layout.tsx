@@ -1,4 +1,6 @@
 import "@/styles/global.css";
+import Navbar from "components/Navbar";
+import AuthProvider from "context/AuthProvider";
 
 export default function RootLayout({
   children,
@@ -8,8 +10,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <h1 className="text-3xl font-bold underline">text-3xl font-bold underline</h1>
-        {children}
+        <AuthProvider>
+          <Navbar />
+          <h1 className="text-3xl font-bold underline">text-3xl font-bold underline</h1>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   )
