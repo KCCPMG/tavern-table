@@ -40,6 +40,11 @@ const options: NextAuthOptions = {
   session: {
     strategy: "jwt",  // default, specify for clarity
     maxAge: 24 * 60 * 60 // 24 hours
+  },
+  callbacks: {
+    async redirect( {url, baseUrl} ) {
+      return '/'
+    }
   }
 }
 
