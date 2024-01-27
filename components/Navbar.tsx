@@ -33,7 +33,7 @@ type NavbarProps = {
 }
 
 
-export default function Navbar({user}: NavbarProps) {
+export default function Navbar({user} : any) {
 
   console.log("Navbar:", user ? user : "no user");
 

@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   const { message, sender } = await req.json();
 
   // const json = await req.json();
-  console.log({message, sender});
+  // console.log({message, sender});
   // console.log({message, sender});
 
   // console.log(pusher);

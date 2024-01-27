@@ -2,7 +2,7 @@ import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
 
-const options: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -19,12 +19,12 @@ const options: NextAuthOptions = {
       },
       async authorize(credentials, request) {
 
-        console.log("test from CredentialsProvider authorize");
-        const user = { id: "1", name: "J Smith", email: "jsmith@example.com" }
+        console.log("\ntest from CredentialsProvider authorize");
+        const user = { id: "1", username: "J Smith", email: "jsmith@example.com", testProperty: "test" }
 
         if (user) {
           // Any object returned will be saved in `user` property of the JWT
-          console.log("authorize: yes user");
+          console.log("authorize: ", {user});
           return user;
         } else {
           // If you return null then an error will be displayed advising the user to check their details.
@@ -39,15 +39,37 @@ const options: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",  // default, specify for clarity
-    maxAge: 24 * 60 * 60 // 24 hours
+    maxAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
-    async redirect( {url, baseUrl} ) {
-      return '/'
+    // async redirect( {url, baseUrl} ) {
+    //   return '/'
+    // },
+    async jwt( {user, token, session} ) {
+      console.log("\n\njwt callback:", { user, token, session });
+      if (user) {
+        return {
+          ...token,
+          username: user.username,
+          testProperty: user.id
+        }
+      }
+      return token;
+    },
+    async session( {session, token, user} ) {
+      console.log("session callback:", {session, token, user} );
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          chungus: token.chungus,
+          username: token.username
+        }
+      }
     }
   }
 }
 
-const handler = NextAuth(options);
+const handler = NextAuth(authOptions);
 
 export {handler as GET, handler as POST};

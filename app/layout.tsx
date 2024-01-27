@@ -3,6 +3,7 @@ import Navbar from "components/Navbar";
 import AuthProvider from "context/AuthProvider";
 import { getServerSession } from "next-auth/next";
 import User from "types/User";
+import { authOptions } from "./api/auth/[...nextauth]/route";
 
 type PropsType = {
   children: React.ReactNode
@@ -10,17 +11,21 @@ type PropsType = {
 
 export default async function RootLayout({ children }: PropsType) {
 
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
+  console.log("Layout Session:", {session});
+  console.log("Layout:", session?.user);
+
+  console.log(session?.user.username); // why doesn't this work?
 
   return (
     <html lang="en">
-      <body>
-        <AuthProvider>
-          <Navbar user={session?.user as User}/>
+      <AuthProvider>
+        <body>
+          <Navbar user={session?.user}/>
           <h1 className="text-3xl font-bold underline">text-3xl font-bold underline</h1>
           {children}
-        </AuthProvider>
-      </body>
+        </body>
+      </AuthProvider>
     </html>
   )
 }

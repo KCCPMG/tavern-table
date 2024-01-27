@@ -8,7 +8,7 @@ export default function PusherTest() {
 
 
   // Enable pusher logging - don't include this in production
-  Pusher.logToConsole = true;
+  // Pusher.logToConsole = true;
 
   const pusher = new Pusher("a1bb6b25bb513f4d5a0a", {
     cluster: "us3"
