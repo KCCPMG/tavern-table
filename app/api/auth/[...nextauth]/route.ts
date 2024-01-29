@@ -1,5 +1,6 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import User from 'types/User';
 
 
 export const authOptions: NextAuthOptions = {
@@ -17,7 +18,7 @@ export const authOptions: NextAuthOptions = {
           type: "password"
         }
       },
-      async authorize(credentials, request) {
+      async authorize(credentials, request): Promise<any> {
 
         console.log("\ntest from CredentialsProvider authorize");
         const user = { id: "1", username: "J Smith", email: "jsmith@example.com", testProperty: "test" }
@@ -42,27 +43,27 @@ export const authOptions: NextAuthOptions = {
     maxAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
-    // async redirect( {url, baseUrl} ) {
-    //   return '/'
-    // },
+    async redirect( {url, baseUrl} ) {
+      return '/'
+    },
     async jwt( {user, token, session} ) {
       console.log("\n\njwt callback:", { user, token, session });
       if (user) {
         return {
           ...token,
           username: user.username,
-          testProperty: user.id
+          testProperty: user.testProperty
         }
       }
       return token;
     },
     async session( {session, token, user} ) {
-      console.log("session callback:", {session, token, user} );
+      console.log("session callback:", { user, token, session } );
       return {
         ...session,
         user: {
           ...session.user,
-          chungus: token.chungus,
+          testProperty: token.testProperty,
           username: token.username
         }
       }
