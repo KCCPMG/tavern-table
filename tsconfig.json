@@ -24,8 +24,7 @@
       {
         "name": "next"
       }
-    ],
-    "typeRoots": ["/types", "/types/", "/types/*", "types", "types/", "types/*", "./types", "./types/", "./types/*"]
+    ]
   },
   "include": [
     "next-env.d.ts",
