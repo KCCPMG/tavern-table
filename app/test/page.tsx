@@ -1,4 +1,6 @@
+"use server"
 import APIGetTest from "./components/APIGetTest";
+import MongooseTest from "./components/MongooseTest";
 import PusherTest from "./components/PusherTest";
 
 export default async function TestPage() {
@@ -6,6 +8,7 @@ export default async function TestPage() {
     <>
       <APIGetTest />
       <PusherTest />
+      <MongooseTest />
     </>
   )
 }
