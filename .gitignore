@@ -29,6 +29,9 @@ yarn-error.log*
 .env*.local
 .env
 
+# testing env files
+jest.setEnvVars.js
+
 # vercel
 .vercel
 
