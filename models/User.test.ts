@@ -1,16 +1,16 @@
 import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
-import User from "./User";
+import User, {UserType} from "./User";
 
 
-type requiredUserValues = {
+type RequiredUserValues = {
   name: string,
   email: string,
   password: string
 }
 
 
-const newUserDetails: requiredUserValues = {  
+const newUserDetails: RequiredUserValues = {  
   name: "testUser",
   email: "testUser@aol.com",
   password: "testPassword"
@@ -28,7 +28,9 @@ afterAll(async function(){
 describe("A user", function() {
 
   test("can be created", async function() {
-    const newUser = await User.create(newUserDetails)
+
+    // make returned UserType obj indexable by string
+    const newUser: {[index: string]: UserType } = await User.create(newUserDetails)
 
     for (let [key, val] of Object.entries(newUserDetails)) {
       
@@ -39,7 +41,7 @@ describe("A user", function() {
   })
 
   test("can be retrieved", async function() {
-    const foundUsers = await User.find(newUserDetails);
+    const foundUsers: {[index: string]: UserType }[] = await User.find(newUserDetails);
     expect(foundUsers.length).toBe(1);
     const foundUser = foundUsers[0];
     for (let [key, val] of Object.entries(newUserDetails)) {
@@ -55,7 +57,7 @@ describe("A user", function() {
   })
 
   test("will not be retrieved", async function() {
-    const foundUsers = await User.find(newUserDetails);
+    const foundUsers: {[index: string]: UserType }[] = await User.find(newUserDetails);
     expect(foundUsers.length).toBe(0);
   })
 
