@@ -1,18 +1,19 @@
 import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
 import User from "./User";
+import Thread from "./Thread";
 import Campaign, { CampaignType } from "./Campaign";
+import { THREAD_CHAT_TYPES } from "./constants";
 
 type RequiredCampaignValues = {
   name: string,
+  threadId: mongoose.Types.ObjectId,
   createdBy?: mongoose.Types.ObjectId
-
 }
 
-const newCampaignDetails: RequiredCampaignValues = {
-  name: "Test Campaign"
-}
-
+const newCampaignDetails = {
+  name: "Test Campaign",
+} as RequiredCampaignValues;
 
 const newUserDetails = {  
   name: "testUser",
@@ -20,15 +21,24 @@ const newUserDetails = {
   password: "testPassword"
 };
 
+const newThreadDetails = {
+  name: "test",
+  chatType: THREAD_CHAT_TYPES.CAMPAIGN
+}
+
 beforeAll(async function() {
   await mongooseConnect();
   await Promise.all([
-    Campaign.deleteMany(newCampaignDetails),
-    User.deleteMany(newUserDetails)
+    User.deleteMany(newUserDetails),
+    Thread.deleteMany(newThreadDetails)
   ]);
-  const newUser = await User.create(newUserDetails);
+  const [newUser, newThread] = await Promise.all([ 
+    User.create(newUserDetails),
+    Thread.create(newThreadDetails)
+  ]);
   newCampaignDetails.createdBy = newUser._id;
-  await Campaign.create(newCampaignDetails);
+  newCampaignDetails.threadId = newThread._id;
+  await Campaign.deleteMany(newCampaignDetails);
 })
 
 afterAll(async function() {
@@ -61,7 +71,8 @@ describe("A campaign", function() {
 
     for (let [key, val] of Object.entries(newCampaignDetails)) {
       expect(foundCampaign).toHaveProperty(key);
-      expect(foundCampaign[key]).toBe(val)
+      // toStrictEqual instead of toBe to handle threadId (mongoose.Types.ObjectId)
+      expect(foundCampaign[key]).toStrictEqual(val)
     }
 
   })
