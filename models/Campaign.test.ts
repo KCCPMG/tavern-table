@@ -11,11 +11,17 @@ type RequiredCampaignValues = {
   createdBy?: mongoose.Types.ObjectId
 }
 
+type RequiredUserValues = {
+  name: string,
+  email: string,
+  password: string
+}
+
 const newCampaignDetails = {
   name: "Test Campaign",
 } as RequiredCampaignValues;
 
-const newUserDetails = {  
+const newUserDetails: RequiredUserValues = {  
   name: "testUser",
   email: "testUser@aol.com",
   password: "testPassword"

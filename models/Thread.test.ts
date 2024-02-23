@@ -3,28 +3,29 @@ import mongoose from 'mongoose';
 import Thread, {ThreadType} from "./Thread";
 import { THREAD_CHAT_TYPES } from "./constants";
 
-const { CHAT, ROOM, CAMPAIGN } = THREAD_CHAT_TYPES;
 
-enum ChatTypes {
-  CHAT, ROOM, CAMPAIGN
-}
+const { CHAT, ROOM, CAMPAIGN } = THREAD_CHAT_TYPES;
+const THREAD_CHAT_TYPES_ARRAY: string[] = [CHAT, ROOM, CAMPAIGN] as const;
+
+
+type ChatTypes = typeof THREAD_CHAT_TYPES_ARRAY[number]
 
 type RequiredThreadValues = {
-  chatType: ChatTypes,
-  name: string
+  name: string,
+  chatType: ChatTypes
 }
 
-const newChatThreadDetails = {
+const newChatThreadDetails: RequiredThreadValues = {
   name: "test",
   chatType: CHAT
 }
 
-const newRoomThreadDetails = {
+const newRoomThreadDetails: RequiredThreadValues = {
   name: "test",
   chatType: ROOM
 }
 
-const newCampaignThreadDetails = {
+const newCampaignThreadDetails: RequiredThreadValues = {
   name: "test",
   chatType: CAMPAIGN
 }
