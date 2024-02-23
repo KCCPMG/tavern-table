@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { MESSAGE_TYPES } from "./constants";
 
+const MESSAGE_TYPE_ARR = Object.values(MESSAGE_TYPES);
+
 const Message = new mongoose.Schema({
   sender: {
     type: mongoose.Types.ObjectId,
@@ -26,7 +28,7 @@ const Message = new mongoose.Schema({
   messageType: {
     required: true,
     type: String,
-    enum: MESSAGE_TYPES,
+    enum: MESSAGE_TYPE_ARR,
     // default: 'TEXT_ONLY'
   },
   text: {
