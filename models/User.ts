@@ -37,6 +37,8 @@ const User = new mongoose.Schema({
   }
 })
 
-export type UserType = mongoose.InferSchemaType<typeof User>;
+export type UserType = mongoose.InferSchemaType<typeof User> & {
+  _id: mongoose.Types.ObjectId
+};
 
 export default mongoose.models.User || mongoose.model('User', User);

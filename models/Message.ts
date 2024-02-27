@@ -50,4 +50,8 @@ const Message = new mongoose.Schema({
   }
 })
 
+export type MessageType = mongoose.InferSchemaType<typeof Message> & {
+  _id: mongoose.Types.ObjectId
+};
+
 export default mongoose.models.Message || mongoose.model("Message", Message);

@@ -21,6 +21,8 @@ const Thread = new mongoose.Schema({
   }
 })
 
-export type ThreadType = mongoose.InferSchemaType<typeof Thread>
+export type ThreadType = mongoose.InferSchemaType<typeof Thread> & {
+  _id: mongoose.Types.ObjectId
+};
 
 export default mongoose.models.Thread || mongoose.model('Thread', Thread)

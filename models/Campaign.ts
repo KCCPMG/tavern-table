@@ -49,7 +49,9 @@ const Campaign = new mongoose.Schema({
   }
 })
 
-export type CampaignType = mongoose.InferSchemaType<typeof Campaign>;
+export type CampaignType = mongoose.InferSchemaType<typeof Campaign> & {
+  _id: mongoose.Types.ObjectId
+};
 
 export default mongoose.models.Campaign || mongoose.model('Campaign', Campaign);
 
