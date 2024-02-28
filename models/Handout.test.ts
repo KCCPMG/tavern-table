@@ -97,12 +97,28 @@ describe("A handout", function() {
     for (let [key, val] of Object.entries(newHandoutDetails)) {
       expect(newHandout).toHaveProperty(key);
       if (key==="image") { 
-        console.log(Object.keys(newHandout.image))
-        expect(newHandout.image).toStrictEqual(newHandoutDetails.image);
+        // const modelImageKeys = Object.keys(newHandout.image);
+        // const detailImageKeys = Object.keys(newHandoutDetails.image);
+        // console.log(modelImageKeys);
+        // console.log(detailImageKeys);
+
+        console.log(typeof newHandout.image);
+        console.log(newHandout.image.isMongooseBuffer);
+        console.log(newHandout.image instanceof Buffer);
+        console.log(newHandout.image instanceof mongoose.Types.Buffer);
+
+        // for (let key of modelImageKeys) {
+        //   if (!(detailImageKeys.includes(key))) {
+        //     console.log(key);
+        //   }
+        // }
+        const image: Buffer = newHandout.image;
+        expect(image.equals(newHandoutDetails.image)).toBe(true);
+        // expect(newHandout.image).toStrictEqual(newHandoutDetails.image);
         // console.log(newHandout["image"]);
         // console.log(newHandoutDetails.image);
       }
-      else expect(newHandout[key]).toStrictEqual(val);
+      else expect(newHandout[key]).toBe(val);
     }
 
   })

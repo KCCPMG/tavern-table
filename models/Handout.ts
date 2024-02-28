@@ -52,7 +52,8 @@ const Handout = new mongoose.Schema({
 });
 
 export type HandoutType = mongoose.InferSchemaType<typeof Handout> & {
-  _id: mongoose.Types.ObjectId
+  _id: mongoose.Types.ObjectId,
+  // image: mongoose.Types.Buffer
 };
 
 export default mongoose.models.Handout || mongoose.model("Handout", Handout);
