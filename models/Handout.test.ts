@@ -13,7 +13,8 @@ const THREAD_CHAT_TYPES_ARRAY: string[] = [CHAT, ROOM, CAMPAIGN] as const;
 
 type ChatTypes = typeof THREAD_CHAT_TYPES_ARRAY[number]
 
-const bufImage = Buffer.from(fs.readFileSync('models/test_resources/sample.jpg'));
+const bufImage: Buffer = Buffer.from(fs.readFileSync('models/test_resources/sample.jpg'));
+
 
 type RequiredUserValues = {
   name: string,
@@ -92,35 +93,18 @@ describe("A handout", function() {
 
     newHandoutDetails.campaignId = newCampaign._id;
     newHandoutDetails.createdBy = newUser._id;
-    const newHandout: {[index: string]: HandoutType} = await Handout.create(newHandoutDetails);
+    const newHandout: HandoutType = await Handout.create(newHandoutDetails);
+
+    expect(newHandout.image.equals(bufImage)).toBe(true);
+
+    const indexableHandout: {[index: string]: any} = newHandout;
 
     for (let [key, val] of Object.entries(newHandoutDetails)) {
-      expect(newHandout).toHaveProperty(key);
-      if (key==="image") { 
-        // const modelImageKeys = Object.keys(newHandout.image);
-        // const detailImageKeys = Object.keys(newHandoutDetails.image);
-        // console.log(modelImageKeys);
-        // console.log(detailImageKeys);
-
-        console.log(typeof newHandout.image);
-        console.log(newHandout.image.isMongooseBuffer);
-        console.log(newHandout.image instanceof Buffer);
-        console.log(newHandout.image instanceof mongoose.Types.Buffer);
-
-        // for (let key of modelImageKeys) {
-        //   if (!(detailImageKeys.includes(key))) {
-        //     console.log(key);
-        //   }
-        // }
-        const image: Buffer = newHandout.image;
-        expect(image.equals(newHandoutDetails.image)).toBe(true);
-        // expect(newHandout.image).toStrictEqual(newHandoutDetails.image);
-        // console.log(newHandout["image"]);
-        // console.log(newHandoutDetails.image);
+      if (key!=="image") { 
+        expect(newHandout).toHaveProperty(key);
+        expect(indexableHandout[key]).toBe(val);
       }
-      else expect(newHandout[key]).toBe(val);
     }
-
   })
 
   test("can be retrieved", async function() {
