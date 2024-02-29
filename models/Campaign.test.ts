@@ -50,7 +50,8 @@ beforeAll(async function() {
 afterAll(async function() {
   await Promise.all([
     Campaign.deleteMany(newCampaignDetails),
-    User.deleteMany(newUserDetails)
+    User.deleteMany(newUserDetails),
+    Thread.deleteMany(newThreadDetails)
   ]);
   mongoose.disconnect();
 })

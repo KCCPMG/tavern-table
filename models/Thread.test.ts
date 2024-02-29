@@ -37,6 +37,7 @@ beforeAll(async function() {
 })
 
 afterAll(async function() {
+  await Thread.deleteMany({name: "test"})
   await mongoose.disconnect();
 })
 
