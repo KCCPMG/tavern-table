@@ -69,12 +69,12 @@ beforeAll(async function() {
 
 
 afterAll(async function() {
-  // await Promise.all([
-  //   User.deleteMany(newUserDetails),
-  //   Thread.deleteMany(newThreadDetails),
-  //   Campaign.deleteMany(newCampaignDetails),
-  //   Handout.deleteMany(newHandoutDetails)
-  // ])
+  await Promise.all([
+    User.deleteMany(newUserDetails),
+    Thread.deleteMany(newThreadDetails),
+    Campaign.deleteMany(newCampaignDetails),
+    Handout.deleteMany(newHandoutDetails)
+  ])
   mongoose.disconnect();
 })
 
@@ -102,21 +102,37 @@ describe("A handout", function() {
     for (let [key, val] of Object.entries(newHandoutDetails)) {
       if (key!=="image") { 
         expect(newHandout).toHaveProperty(key);
-        expect(indexableHandout[key]).toBe(val);
+        expect(indexableHandout[key]).toStrictEqual(val);
       }
     }
   })
 
   test("can be retrieved", async function() {
-    Handout.find(newHandoutDetails)
+    const foundHandouts: Array<HandoutType> = await Handout.find(newHandoutDetails);
+
+    expect(foundHandouts.length).toBe(1);
+    const newHandout: HandoutType = foundHandouts[0];
+
+    expect(newHandout.image.equals(bufImage)).toBe(true);
+
+    const indexableHandout: {[index: string]: any} = newHandout;
+
+    for (let [key, val] of Object.entries(newHandoutDetails)) {
+      if (key!=="image") { 
+        expect(newHandout).toHaveProperty(key);
+        expect(indexableHandout[key]).toStrictEqual(val);
+      }
+    }
   })
 
   test("can be deleted", async function() {
-    
+    await Handout.deleteMany(newHandoutDetails);
   })
 
   test("will not be retrieved", async function() {
-    
+    const foundHandouts: Array<HandoutType> = await Handout.find(newHandoutDetails);
+
+    expect(foundHandouts.length).toBe(0);
   })
 
 })
