@@ -1,6 +1,6 @@
 import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
-import User from "./User";
+import User, { RequiredUserValues } from "./User";
 import Thread from "./Thread";
 import Campaign, { CampaignType } from "./Campaign";
 import { THREAD_CHAT_TYPES } from "./constants";
@@ -9,12 +9,6 @@ type RequiredCampaignValues = {
   name: string,
   threadId: mongoose.Types.ObjectId,
   createdBy?: mongoose.Types.ObjectId
-}
-
-type RequiredUserValues = {
-  name: string,
-  email: string,
-  password: string
 }
 
 const newCampaignDetails = {

@@ -1,6 +1,16 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
-const User = new mongoose.Schema({
+export type RequiredUserValues = {
+  name: string,
+  email: string,
+  password: string
+}
+
+const salt_rounds = process.env.NODE_ENV === "production" ? 12 : 1;
+const salt = bcrypt.genSaltSync(salt_rounds);
+
+const UserSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true
@@ -9,7 +19,7 @@ const User = new mongoose.Schema({
     type: String,
     required: true
   },
-  password: {
+  hashedPassword: {
     type: String,
     required: true
   },
@@ -34,11 +44,25 @@ const User = new mongoose.Schema({
   friends: {
     type: [mongoose.Types.ObjectId],
     default: []
-  }
+  },
 })
 
-export type UserType = mongoose.InferSchemaType<typeof User> & {
+// UserSchema.statics.register = async function({name, email, password} : RequiredUserValues) : Promise<UserType> {
+//   const hashedPassword = bcrypt.hashSync(password, salt);
+//   const newUser = await this.create({name, email, hashedPassword});
+//   return newUser;
+// }
+
+UserSchema.static('register', async function({name, email, password} : RequiredUserValues) : Promise<UserType> {
+  const hashedPassword = bcrypt.hashSync(password, salt);
+  const newUser = await this.create({name, email, hashedPassword});
+  return newUser;
+})
+
+// User.statics.signIn = async function()
+
+export type UserType = mongoose.InferSchemaType<typeof UserSchema> & {
   _id: mongoose.Types.ObjectId
 };
 
-export default mongoose.models.User || mongoose.model('User', User);
+export default mongoose.models.User || mongoose.model('User', UserSchema);

@@ -1,13 +1,7 @@
 import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
-import User, {UserType} from "./User";
+import User, {UserType, RequiredUserValues} from "./User";
 
-
-type RequiredUserValues = {
-  name: string,
-  email: string,
-  password: string
-}
 
 
 const newUserDetails: RequiredUserValues = {  
@@ -27,13 +21,16 @@ afterAll(async function(){
 
 describe("A user", function() {
 
-  test("can be created", async function() {
+  test("can be registered", async function() {
 
     // make returned UserType obj indexable by string
-    const newUser: {[index: string]: UserType } = await User.create(newUserDetails)
+    const newUser: {[index: string]: UserType } = await User.schema.statics.register(newUserDetails)
 
     for (let [key, val] of Object.entries(newUserDetails)) {
       
+      if (key === "password") {
+        continue;
+      }
       expect(newUser).toHaveProperty(key);
       expect(newUser[key]).toBe(val);
 
@@ -46,6 +43,9 @@ describe("A user", function() {
     const foundUser = foundUsers[0];
     for (let [key, val] of Object.entries(newUserDetails)) {
       
+      if (key === "password") {
+        continue;
+      }
       expect(foundUser).toHaveProperty(key);
       expect(foundUser[key]).toBe(val);
 
