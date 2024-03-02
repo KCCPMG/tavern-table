@@ -1,16 +1,29 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
+const salt_rounds = process.env.NODE_ENV === "production" ? 12 : 1;
+const salt = bcrypt.genSaltSync(salt_rounds);
+
+
 export type RequiredUserValues = {
   name: string,
   email: string,
   password: string
 }
 
-const salt_rounds = process.env.NODE_ENV === "production" ? 12 : 1;
-const salt = bcrypt.genSaltSync(salt_rounds);
+export interface IUser {
+  _id: mongoose.Types.ObjectId,
+  name: string,
+  email: string,
+  hashedPassword: string,
+  confirmed: boolean,
+  createTime: Date,
+  characters: Array<mongoose.Types.ObjectId>,
+  campaigns: Array<mongoose.Types.ObjectId>,
+  friends: Array<mongoose.Types.ObjectId>,
+}
 
-const UserSchema = new mongoose.Schema({
+export const UserSchema = new mongoose.Schema<IUser>({
   name: {
     type: String,
     required: true
@@ -47,13 +60,17 @@ const UserSchema = new mongoose.Schema({
   },
 })
 
+export interface UserModel extends mongoose.Model<IUser> {
+  register(newUserDetails: RequiredUserValues): Promise<IUser>
+}
+
 // UserSchema.statics.register = async function({name, email, password} : RequiredUserValues) : Promise<UserType> {
 //   const hashedPassword = bcrypt.hashSync(password, salt);
 //   const newUser = await this.create({name, email, hashedPassword});
 //   return newUser;
 // }
 
-UserSchema.static('register', async function({name, email, password} : RequiredUserValues) : Promise<UserType> {
+UserSchema.static('register', async function register({name, email, password} : RequiredUserValues) : Promise<IUser> {
   const hashedPassword = bcrypt.hashSync(password, salt);
   const newUser = await this.create({name, email, hashedPassword});
   return newUser;
@@ -65,4 +82,16 @@ export type UserType = mongoose.InferSchemaType<typeof UserSchema> & {
   _id: mongoose.Types.ObjectId
 };
 
-export default mongoose.models.User || mongoose.model('User', UserSchema);
+// const User: mongoose.Model<any, {}, {}, {}, IUser, UserModel> = 
+//   mongoose.models.User || 
+//   mongoose.model<IUser, UserModel>("User", UserSchema);
+
+
+const User = mongoose.model<IUser, UserModel>("User", UserSchema); 
+const SavedUser = mongoose.models.User as UserModel;
+
+export default  mongoose.models.User as UserModel || mongoose.model<IUser, UserModel>("User", UserSchema);
+
+
+
+
