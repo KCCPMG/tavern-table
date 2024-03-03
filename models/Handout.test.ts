@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import mongooseConnect from "@/lib/mongooseConnect"
 import Handout,{ HandoutType } from "./Handout";
 import Campaign, { CampaignType } from "./Campaign";
-import User, { UserType } from "./User";
+import User, { IUser } from "./User";
 import Thread, { ThreadType } from "./Thread";
 import { THREAD_CHAT_TYPES } from "./constants";
 
@@ -82,7 +82,7 @@ afterAll(async function() {
 describe("A handout", function() {
 
   test("can be created", async function() {
-    const newUser: UserType = await User.create(newUserDetails);
+    const newUser: IUser = await User.register(newUserDetails);
 
     newThreadDetails.participants.push(newUser._id);
     const newThread: ThreadType = await Thread.create(newThreadDetails);
