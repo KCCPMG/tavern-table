@@ -64,11 +64,6 @@ export interface UserModel extends mongoose.Model<IUser> {
   register(newUserDetails: RequiredUserValues): Promise<IUser>
 }
 
-// UserSchema.statics.register = async function({name, email, password} : RequiredUserValues) : Promise<UserType> {
-//   const hashedPassword = bcrypt.hashSync(password, salt);
-//   const newUser = await this.create({name, email, hashedPassword});
-//   return newUser;
-// }
 
 UserSchema.static('register', async function register({name, email, password} : RequiredUserValues) : Promise<IUser> {
   const hashedPassword = bcrypt.hashSync(password, salt);
@@ -76,19 +71,6 @@ UserSchema.static('register', async function register({name, email, password} : 
   return newUser;
 })
 
-// User.statics.signIn = async function()
-
-export type UserType = mongoose.InferSchemaType<typeof UserSchema> & {
-  _id: mongoose.Types.ObjectId
-};
-
-// const User: mongoose.Model<any, {}, {}, {}, IUser, UserModel> = 
-//   mongoose.models.User || 
-//   mongoose.model<IUser, UserModel>("User", UserSchema);
-
-
-const User = mongoose.model<IUser, UserModel>("User", UserSchema); 
-const SavedUser = mongoose.models.User as UserModel;
 
 export default  mongoose.models.User as UserModel || mongoose.model<IUser, UserModel>("User", UserSchema);
 

@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 import User, {IUser, RequiredUserValues} from "./User";
 
 
-
 const newUserDetails: RequiredUserValues = {  
   name: "testUser",
   email: "testUser@aol.com",
@@ -21,6 +20,7 @@ beforeAll(async function() {
 })
 
 afterAll(async function(){
+  await User.deleteMany(createdUserDetails);
   mongoose.disconnect();
 })
 
@@ -29,8 +29,6 @@ describe("A user", function() {
   test("can be registered", async function() {
 
     const newUser: IUser = await User.register(newUserDetails);
-    // UserSchema.register(newUserDetails);
-    
     
     // make returned IUser obj indexable by string
     const indexableNewUser:{[index: string]: any} = newUser;
