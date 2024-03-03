@@ -1,6 +1,6 @@
 import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
-import User, { RequiredUserValues } from "./User";
+import User, { RequiredUserValues, IUser } from "./User";
 import Thread from "./Thread";
 import Campaign, { CampaignType } from "./Campaign";
 import { THREAD_CHAT_TYPES } from "./constants";
@@ -32,8 +32,8 @@ beforeAll(async function() {
     User.deleteMany(newUserDetails),
     Thread.deleteMany(newThreadDetails)
   ]);
-  const [newUser, newThread] = await Promise.all([ 
-    User.create(newUserDetails),
+  const [newUser, newThread]: Array<IUser> = await Promise.all([ 
+    User.register(newUserDetails),
     Thread.create(newThreadDetails)
   ]);
   newCampaignDetails.createdBy = newUser._id;

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import Campaign from "./Campaign";
-import User from "./User";
+import User, { IUser, RequiredUserValues} from "./User";
 import Thread, { ThreadType } from "./Thread";
 import JournalEntry, { JournalEntryType } from "./JournalEntry";
 import mongooseConnect from "@/lib/mongooseConnect";
@@ -10,12 +10,6 @@ const { CHAT, ROOM, CAMPAIGN } = THREAD_CHAT_TYPES;
 const THREAD_CHAT_TYPES_ARRAY: string[] = [CHAT, ROOM, CAMPAIGN] as const;
 
 type ChatTypes = typeof THREAD_CHAT_TYPES_ARRAY[number]
-
-type RequiredUserValues = {
-  name: string,
-  email: string,
-  password: string
-}
 
 type RequiredCampaignValues = {
   name: string,
@@ -61,10 +55,16 @@ beforeAll(async function() {
     Campaign.deleteMany(newCampaignDetails),
     Thread.deleteMany(newThreadDetails),
     JournalEntry.deleteMany(newJournalEntryDetails)
-  ])
+  ]);
 })
 
 afterAll(async function() {
+  await Promise.all([
+    User.deleteMany(newUserDetails),
+    Campaign.deleteMany(newCampaignDetails),
+    Thread.deleteMany(newThreadDetails),
+    JournalEntry.deleteMany(newJournalEntryDetails)
+  ]);
   await mongoose.disconnect();
 })
 
@@ -72,7 +72,7 @@ afterAll(async function() {
 describe("A JournalEntry", function() {
 
   test("can be created", async function() {
-    const newUser = await User.create(newUserDetails);
+    const newUser: IUser = await User.register(newUserDetails);
     newThreadDetails.participants.push(newUser._id);
     const newThread = await Thread.create(newThreadDetails);
     newCampaignDetails.createdBy = newUser._id;
