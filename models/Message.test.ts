@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import Thread from "./Thread";
 import Message from "./Message";
 import { MESSAGE_TYPES, THREAD_CHAT_TYPES } from "./constants";
-import User, { UserType } from "./User";
+import User, { IUser } from "./User";
 import mongooseConnect from '@/lib/mongooseConnect';
 
 
@@ -116,10 +116,9 @@ describe("A message", function(){
   
   test("can be created", async function() {
     
-    
-    const [firstUser, secondUser]= await Promise.all([
-      User.create(firstUserDetails),
-      User.create(secondUserDetails)
+    const [firstUser, secondUser]: Array<IUser> = await Promise.all([
+      User.register(firstUserDetails),
+      User.register(secondUserDetails)
     ]);
 
     newThreadDetails.participants = [firstUser._id, secondUser._id];
