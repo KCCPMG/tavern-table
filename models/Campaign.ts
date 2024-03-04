@@ -1,5 +1,20 @@
 import mongoose from "mongoose";
 
+export interface ICampaign {
+  _id: mongoose.Types.ObjectId,
+  name: string, 
+  createdBy: mongoose.Types.ObjectId, 
+  createdOn: Date, description: string, 
+  dm: Array<mongoose.Types.ObjectId>,
+  handouts: Array<mongoose.Types.ObjectId>,
+  game: string,
+  players: Array<mongoose.Types.ObjectId>,
+  invitedPlayers: Array<mongoose.Types.ObjectId>,
+  journalEntries: Array<mongoose.Types.ObjectId>,
+  index: Array<mongoose.Types.ObjectId>,
+  threadId: mongoose.Types.ObjectId
+}
+
 const Campaign = new mongoose.Schema({
   name: {
     type: String,
@@ -49,9 +64,6 @@ const Campaign = new mongoose.Schema({
   }
 })
 
-export type CampaignType = mongoose.InferSchemaType<typeof Campaign> & {
-  _id: mongoose.Types.ObjectId
-};
 
 export default mongoose.models.Campaign || mongoose.model('Campaign', Campaign);
 

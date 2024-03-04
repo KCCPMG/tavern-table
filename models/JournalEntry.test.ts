@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Campaign from "./Campaign";
+import Campaign, { ICampaign } from "./Campaign";
 import User, { IUser, RequiredUserValues} from "./User";
 import Thread, { ThreadType } from "./Thread";
 import JournalEntry, { JournalEntryType } from "./JournalEntry";
@@ -77,7 +77,7 @@ describe("A JournalEntry", function() {
     const newThread = await Thread.create(newThreadDetails);
     newCampaignDetails.createdBy = newUser._id;
     newCampaignDetails.threadId = newThread._id;
-    const newCampaign = await Campaign.create(newCampaignDetails);
+    const newCampaign: ICampaign = await Campaign.create(newCampaignDetails);
     newJournalEntryDetails.campaignId = newCampaign._id;
     newJournalEntryDetails.createdBy = newUser._id;
 

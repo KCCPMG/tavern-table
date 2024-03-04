@@ -2,7 +2,7 @@ import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
 import User, { RequiredUserValues, IUser } from "./User";
 import Thread from "./Thread";
-import Campaign, { CampaignType } from "./Campaign";
+import Campaign, { ICampaign } from "./Campaign";
 import { THREAD_CHAT_TYPES } from "./constants";
 
 type RequiredCampaignValues = {
@@ -56,7 +56,7 @@ describe("A campaign", function() {
   test("can be created", async function() {
 
     // make returned UserType obj indexable by string
-    const newCampaign: {[index: string]: CampaignType} = await Campaign.create(newCampaignDetails);
+    const newCampaign: {[index: string]: ICampaign} = await Campaign.create(newCampaignDetails);
     
     for (let [key, val] of Object.entries(newCampaignDetails)) {
       expect(newCampaign).toHaveProperty(key);
@@ -66,7 +66,7 @@ describe("A campaign", function() {
   })
 
   test("can be retrieved", async function() {
-    const foundCampaigns: {[index: string]: CampaignType}[] = await Campaign.find(newCampaignDetails);
+    const foundCampaigns: {[index: string]: ICampaign}[] = await Campaign.find(newCampaignDetails);
     expect(foundCampaigns.length).toBe(1);
     const foundCampaign = foundCampaigns[0];
 
@@ -83,7 +83,7 @@ describe("A campaign", function() {
   })
 
   test("will not be retrieved", async function() {
-    const foundCampaigns: {[index: string]: CampaignType}[] = await Campaign.find(newCampaignDetails);
+    const foundCampaigns: {[index: string]: ICampaign}[] = await Campaign.find(newCampaignDetails);
     expect(foundCampaigns.length).toBe(0);
   })
 

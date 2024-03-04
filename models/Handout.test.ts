@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import mongooseConnect from "@/lib/mongooseConnect"
 import Handout,{ HandoutType } from "./Handout";
-import Campaign, { CampaignType } from "./Campaign";
+import Campaign, { ICampaign } from "./Campaign";
 import User, { IUser } from "./User";
 import Thread, { ThreadType } from "./Thread";
 import { THREAD_CHAT_TYPES } from "./constants";
@@ -89,7 +89,7 @@ describe("A handout", function() {
 
     newCampaignDetails.createdBy = newUser._id;
     newCampaignDetails.threadId = newThread._id;
-    const newCampaign: CampaignType = await Campaign.create(newCampaignDetails);
+    const newCampaign: ICampaign = await Campaign.create(newCampaignDetails);
 
     newHandoutDetails.campaignId = newCampaign._id;
     newHandoutDetails.createdBy = newUser._id;
