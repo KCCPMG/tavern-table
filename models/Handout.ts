@@ -1,5 +1,33 @@
 import mongoose from "mongoose";
 
+export interface IHandout {
+  _id: mongoose.Types.ObjectId,
+  createdBy: {
+    type: mongoose.Types.ObjectId,
+    required: true
+  },
+  createdOn: Date,
+  campaignId: mongoose.Types.ObjectId,
+  editedBy: mongoose.Types.ObjectId,
+  editedOn: Date,
+  handoutTitle: string,
+  image: Buffer,
+  description: string,
+  notes: Array<INote>
+}
+
+interface INote {
+  position: {
+    type: {
+      x: number,
+      y: number
+    }
+  }, 
+  text: {
+    type: string,
+  }
+}
+
 const Handout = new mongoose.Schema({
   createdBy: {
     type: mongoose.Types.ObjectId,
@@ -51,9 +79,6 @@ const Handout = new mongoose.Schema({
   }
 });
 
-export type HandoutType = mongoose.InferSchemaType<typeof Handout> & {
-  _id: mongoose.Types.ObjectId,
-  // image: mongoose.Types.Buffer
-};
+
 
 export default mongoose.models.Handout || mongoose.model("Handout", Handout);

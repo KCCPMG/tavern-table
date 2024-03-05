@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import mongooseConnect from "@/lib/mongooseConnect"
-import Handout,{ HandoutType } from "./Handout";
+import Handout,{ IHandout } from "./Handout";
 import Campaign, { ICampaign } from "./Campaign";
 import User, { IUser } from "./User";
 import Thread, { ThreadType } from "./Thread";
@@ -93,7 +93,7 @@ describe("A handout", function() {
 
     newHandoutDetails.campaignId = newCampaign._id;
     newHandoutDetails.createdBy = newUser._id;
-    const newHandout: HandoutType = await Handout.create(newHandoutDetails);
+    const newHandout: IHandout = await Handout.create(newHandoutDetails);
 
     expect(newHandout.image.equals(bufImage)).toBe(true);
 
@@ -108,10 +108,10 @@ describe("A handout", function() {
   })
 
   test("can be retrieved", async function() {
-    const foundHandouts: Array<HandoutType> = await Handout.find(newHandoutDetails);
+    const foundHandouts: Array<IHandout> = await Handout.find(newHandoutDetails);
 
     expect(foundHandouts.length).toBe(1);
-    const newHandout: HandoutType = foundHandouts[0];
+    const newHandout: IHandout = foundHandouts[0];
 
     expect(newHandout.image.equals(bufImage)).toBe(true);
 
@@ -130,7 +130,7 @@ describe("A handout", function() {
   })
 
   test("will not be retrieved", async function() {
-    const foundHandouts: Array<HandoutType> = await Handout.find(newHandoutDetails);
+    const foundHandouts: Array<IHandout> = await Handout.find(newHandoutDetails);
 
     expect(foundHandouts.length).toBe(0);
   })
