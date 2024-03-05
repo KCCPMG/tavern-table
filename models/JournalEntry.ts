@@ -1,5 +1,15 @@
 import mongoose from 'mongoose';
 
+export interface IJournalEntry {
+  campaignId: mongoose.Types.ObjectId,
+  createdBy: mongoose.Types.ObjectId,
+  createdDAte: Date,
+  lastEditedBy: mongoose.Types.ObjectId,
+  lastEditedDate: Date,
+  title: string,
+  text: string,
+}
+
 const JournalEntry = new mongoose.Schema({
   campaignId: {
     type: mongoose.Types.ObjectId,
@@ -29,7 +39,5 @@ const JournalEntry = new mongoose.Schema({
     type: String
   }
 })
-
-export type JournalEntryType = mongoose.InferSchemaType<typeof JournalEntry>
 
 export default mongoose.models.JournalEntry || mongoose.model("JournalEntry", JournalEntry);

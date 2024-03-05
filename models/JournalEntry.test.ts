@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import Campaign, { ICampaign } from "./Campaign";
 import User, { IUser, RequiredUserValues} from "./User";
 import Thread, { ThreadType } from "./Thread";
-import JournalEntry, { JournalEntryType } from "./JournalEntry";
+import JournalEntry, { IJournalEntry } from "./JournalEntry";
 import mongooseConnect from "@/lib/mongooseConnect";
 import { THREAD_CHAT_TYPES } from "./constants";
 
@@ -81,7 +81,7 @@ describe("A JournalEntry", function() {
     newJournalEntryDetails.campaignId = newCampaign._id;
     newJournalEntryDetails.createdBy = newUser._id;
 
-    const newJournalEntry = await JournalEntry.create(newJournalEntryDetails);
+    const newJournalEntry: {[index: string]: IJournalEntry} = await JournalEntry.create(newJournalEntryDetails);
 
     for (let [key, val] of Object.entries(newJournalEntryDetails)) {
       expect(newJournalEntry).toHaveProperty(key);
@@ -91,7 +91,7 @@ describe("A JournalEntry", function() {
 
   test("can be retrieved", async function() {
 
-    const journalEntries = await JournalEntry.find(newJournalEntryDetails);
+    const journalEntries: Array<{[index: string]: IJournalEntry}> = await JournalEntry.find(newJournalEntryDetails);
     expect(journalEntries.length).toBe(1);
 
     const newJournalEntry = journalEntries[0];
