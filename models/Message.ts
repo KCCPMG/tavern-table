@@ -5,6 +5,7 @@ const MESSAGE_TYPE_ARR = Object.values(MESSAGE_TYPES);
 
 
 export interface IMessage {
+  _id: mongoose.Types.ObjectId,
   sender: mongoose.Types.ObjectId,
   directRecipient?: mongoose.Types.ObjectId,
   campaignId?: mongoose.Types.ObjectId,
