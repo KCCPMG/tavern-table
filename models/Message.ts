@@ -3,6 +3,22 @@ import { MESSAGE_TYPES } from "./constants";
 
 const MESSAGE_TYPE_ARR = Object.values(MESSAGE_TYPES);
 
+
+export interface IMessage {
+  sender: mongoose.Types.ObjectId,
+  directRecipient?: mongoose.Types.ObjectId,
+  campaignId?: mongoose.Types.ObjectId,
+  threadIds: Array<mongoose.Types.ObjectId>,
+  sendTime: Date,
+  messageType: typeof MESSAGE_TYPE_ARR[number],
+  text?: string,
+  response?: {
+    messageId: mongoose.Types.ObjectId,
+    messageType: typeof MESSAGE_TYPE_ARR[number]
+  },
+  readBy: Array<mongoose.Types.ObjectId>
+}
+
 const Message = new mongoose.Schema({
   sender: {
     type: mongoose.Types.ObjectId,
@@ -50,8 +66,6 @@ const Message = new mongoose.Schema({
   }
 })
 
-export type MessageType = mongoose.InferSchemaType<typeof Message> & {
-  _id: mongoose.Types.ObjectId
-};
+
 
 export default mongoose.models.Message || mongoose.model("Message", Message);

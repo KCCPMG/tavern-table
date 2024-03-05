@@ -1,52 +1,20 @@
 import mongoose from 'mongoose';
 import Thread from "./Thread";
-import Message from "./Message";
+import Message, { IMessage } from "./Message";
 import { MESSAGE_TYPES, THREAD_CHAT_TYPES } from "./constants";
 import User, { IUser } from "./User";
 import mongooseConnect from '@/lib/mongooseConnect';
 
 
-const {
-  BEFRIEND_REQUEST,
-  BEFRIEND_ACCEPT,
-  BEFRIEND_REJECT,
-  CAMPAIGN_INVITE,
-  CAMPAIGN_INVITE_ACCEPT,
-  CAMPAIGN_INVITE_REJECT,
-  END_FRIENDSHIP,
-  EXIT_CAMPAIGN,
-  PROMOTE_TO_DM,
-  REMOVE_FROM_CAMPAIGN,
-  ROOM_INVITE,
-  ROOM_INVITE_ACCEPT,
-  ROOM_INVITE_REJECT,
-  STEP_DOWN_DM,
-  TEXT_ONLY
-} = MESSAGE_TYPES;
+const MESSAGE_TYPE_ARRAY = Object.values(MESSAGE_TYPES);
 
-const MESSAGE_TYPE_ARRAY = [  
-  BEFRIEND_REQUEST,
-  BEFRIEND_ACCEPT,
-  BEFRIEND_REJECT,
-  CAMPAIGN_INVITE,
-  CAMPAIGN_INVITE_ACCEPT,
-  CAMPAIGN_INVITE_REJECT,
-  END_FRIENDSHIP,
-  EXIT_CAMPAIGN,
-  PROMOTE_TO_DM,
-  REMOVE_FROM_CAMPAIGN,
-  ROOM_INVITE,
-  ROOM_INVITE_ACCEPT,
-  ROOM_INVITE_REJECT,
-  STEP_DOWN_DM,
-  TEXT_ONLY
-] as const;
 
-type MessageType = typeof MESSAGE_TYPE_ARRAY[number];
-
+const { TEXT_ONLY } = MESSAGE_TYPES;
 const { CHAT, ROOM, CAMPAIGN } = THREAD_CHAT_TYPES;
 const THREAD_CHAT_TYPES_ARRAY: string[] = [CHAT, ROOM, CAMPAIGN] as const;
+
 type ChatTypes = typeof THREAD_CHAT_TYPES_ARRAY[number]
+type MessageType = typeof MESSAGE_TYPE_ARRAY[number];
 
 type RequiredUserValues = {
   name: string,
@@ -127,11 +95,13 @@ describe("A message", function(){
     newMessageDetails.threadIds = [newThread._id];
 
 
-    const newMessage: {[index: string]: MessageType} = await Message.create(newMessageDetails);
+    const newMessage: IMessage = await Message.create(newMessageDetails);
+
+    const indexableMessage: {[index: string]: any} = newMessage;
 
     for (let [key, val] of Object.entries(newMessageDetails)) {
-      expect(newMessage).toHaveProperty(key);
-      expect(newMessage[key]).toStrictEqual(val);
+      expect(indexableMessage).toHaveProperty(key);
+      expect(indexableMessage[key]).toStrictEqual(val);
     }
   })
 

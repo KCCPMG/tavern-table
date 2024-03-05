@@ -5,7 +5,7 @@ export const THREAD_CHAT_TYPES = {
   CAMPAIGN: "CAMPAIGN"
 }
 
-export const MESSAGE_TYPES = {
+export const MESSAGE_TYPES: {[index: string]: string} = {
   BEFRIEND_REQUEST: 'BEFRIEND_REQUEST',
   BEFRIEND_ACCEPT: 'BEFRIEND_ACCEPT',
   BEFRIEND_REJECT: 'BEFRIEND_REJECT',
