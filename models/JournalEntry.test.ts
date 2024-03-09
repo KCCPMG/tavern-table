@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Campaign, { ICampaign } from "./Campaign";
 import User, { IUser, RequiredUserValues} from "./User";
-import Thread, { ThreadType } from "./Thread";
+import Thread, { IThread } from "./Thread";
 import JournalEntry, { IJournalEntry } from "./JournalEntry";
 import mongooseConnect from "@/lib/mongooseConnect";
 import { THREAD_CHAT_TYPES } from "./constants";
@@ -74,7 +74,7 @@ describe("A JournalEntry", function() {
   test("can be created", async function() {
     const newUser: IUser = await User.register(newUserDetails);
     newThreadDetails.participants.push(newUser._id);
-    const newThread = await Thread.create(newThreadDetails);
+    const newThread: IThread = await Thread.create(newThreadDetails);
     newCampaignDetails.createdBy = newUser._id;
     newCampaignDetails.threadId = newThread._id;
     const newCampaign: ICampaign = await Campaign.create(newCampaignDetails);

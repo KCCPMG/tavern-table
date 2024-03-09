@@ -1,6 +1,6 @@
 import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
-import Thread, {ThreadType} from "./Thread";
+import Thread, { IThread } from "./Thread";
 import { THREAD_CHAT_TYPES } from "./constants";
 
 
@@ -47,31 +47,34 @@ describe("A thread", function() {
   test("can be created", async function() {
 
     // make returned ThreadType obj indexable by string
-    const [newChatThread, newRoomThread, newCampaignThread] = await Promise.all([
+    const [newChatThread, newRoomThread, newCampaignThread]: Array<IThread> = await Promise.all([
       Thread.create(newChatThreadDetails),
       Thread.create(newRoomThreadDetails),
       Thread.create(newCampaignThreadDetails)
     ])
 
+    const indexableNewChatThread: {[index: string]: any} = newChatThread;
     for (let [key, val] of Object.entries(newChatThreadDetails)) {
-      expect(newChatThread).toHaveProperty(key);
-      expect(newChatThread[key]).toBe(val);
+      expect(indexableNewChatThread).toHaveProperty(key);
+      expect(indexableNewChatThread[key]).toBe(val);
     }
 
+    const indexableNewRoomThread: {[index: string]: any} = newRoomThread;
     for (let [key, val] of Object.entries(newRoomThreadDetails)) {
-      expect(newRoomThread).toHaveProperty(key);
-      expect(newRoomThread[key]).toBe(val);
+      expect(indexableNewRoomThread).toHaveProperty(key);
+      expect(indexableNewRoomThread[key]).toBe(val);
     }
 
+    const indexableNewCampaignThread: {[index: string]: any} = newCampaignThread;
     for (let [key, val] of Object.entries(newCampaignThreadDetails)) {
-      expect(newCampaignThread).toHaveProperty(key);
-      expect(newCampaignThread[key]).toBe(val);
+      expect(indexableNewCampaignThread).toHaveProperty(key);
+      expect(indexableNewCampaignThread[key]).toBe(val);
     }
 
   })
 
   test("can be retrieved", async function() {
-    const foundThreads: {[index: string]: ThreadType}[] = await Thread.find({name: "test"});
+    const foundThreads: {[index: string]: IThread}[] = await Thread.find({name: "test"});
     expect(foundThreads.length).toBe(3);
     foundThreads.forEach(ft => {
       expect(ft).toHaveProperty('name');
@@ -84,7 +87,7 @@ describe("A thread", function() {
   })
 
   test("will not be retrieved", async function() {
-    const foundThreads: {[index: string]: ThreadType} [] = await Thread.find({name: "test"});
+    const foundThreads: {[index: string]: IThread} [] = await Thread.find({name: "test"});
     expect(foundThreads.length).toBe(0);
   })
 

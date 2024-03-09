@@ -1,6 +1,16 @@
 import mongoose from 'mongoose';
 import { THREAD_CHAT_TYPES } from './constants';
 
+const THREAD_CHAT_TYPES_ARRAY = Object.values(THREAD_CHAT_TYPES);
+
+export interface IThread {
+  _id: mongoose.Types.ObjectId,
+  participants: Array<mongoose.Types.ObjectId>,
+  chatType: typeof THREAD_CHAT_TYPES_ARRAY[number],
+  campaignId?: mongoose.Types.ObjectId,
+  name?: string
+}
+
 const Thread = new mongoose.Schema({
   participants: {
     required: true,
@@ -20,9 +30,5 @@ const Thread = new mongoose.Schema({
     required: false
   }
 })
-
-export type ThreadType = mongoose.InferSchemaType<typeof Thread> & {
-  _id: mongoose.Types.ObjectId
-};
 
 export default mongoose.models.Thread || mongoose.model('Thread', Thread)
