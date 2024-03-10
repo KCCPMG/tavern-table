@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import Thread from "./Thread";
 import Message, { IMessage } from "./Message";
 import { MESSAGE_TYPES, THREAD_CHAT_TYPES } from "./constants";
-import User, { IUser } from "./User";
+import User, { RequiredUserValues, IUser } from "./User";
 import mongooseConnect from '@/lib/mongooseConnect';
 
 
@@ -16,11 +16,6 @@ const THREAD_CHAT_TYPES_ARRAY: string[] = [CHAT, ROOM, CAMPAIGN] as const;
 type ChatTypes = typeof THREAD_CHAT_TYPES_ARRAY[number]
 type MessageType = typeof MESSAGE_TYPE_ARRAY[number];
 
-type RequiredUserValues = {
-  name: string,
-  email: string,
-  password: string
-}
 
 type RequiredThreadValues = {
   name: string,
@@ -36,13 +31,13 @@ type RequiredMessageValues = {
 }
 
 const firstUserDetails: RequiredUserValues = {  
-  name: "testUser1",
+  username: "testUser1",
   email: "testUser@aol.com",
   password: "testPassword"
 };
 
 const secondUserDetails: RequiredUserValues = {
-  name: "testUser2",
+  username: "testUser2",
   email: "testUser@aol.com",
   password: "testPassword"
 }

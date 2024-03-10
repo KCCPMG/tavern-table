@@ -16,7 +16,7 @@ const newCampaignDetails = {
 } as RequiredCampaignValues;
 
 const newUserDetails: RequiredUserValues = {  
-  name: "testUser",
+  username: "testUser",
   email: "testUser@aol.com",
   password: "testPassword"
 };

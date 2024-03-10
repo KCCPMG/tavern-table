@@ -1,19 +1,20 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import { UserNotFoundErr, InvalidPasswordErr } from "app/utils/NextError";
 
 const salt_rounds = process.env.NODE_ENV === "production" ? 12 : 1;
 const salt = bcrypt.genSaltSync(salt_rounds);
 
 
 export type RequiredUserValues = {
-  name: string,
+  username: string,
   email: string,
   password: string
 }
 
 export interface IUser {
   _id: mongoose.Types.ObjectId,
-  name: string,
+  username: string,
   email: string,
   hashedPassword: string,
   confirmed: boolean,
@@ -24,7 +25,7 @@ export interface IUser {
 }
 
 export const UserSchema = new mongoose.Schema<IUser>({
-  name: {
+  username: {
     type: String,
     required: true
   },
@@ -61,14 +62,27 @@ export const UserSchema = new mongoose.Schema<IUser>({
 })
 
 export interface UserModel extends mongoose.Model<IUser> {
-  register(newUserDetails: RequiredUserValues): Promise<IUser>
+  register(newUserDetails: RequiredUserValues): Promise<IUser>,
+  authenticate(username: string, password: string): Promise<IUser>
 }
 
 
-UserSchema.static('register', async function register({name, email, password} : RequiredUserValues) : Promise<IUser> {
+UserSchema.static('register', async function register({username, email, password} : RequiredUserValues) : Promise<IUser> {
   const hashedPassword = bcrypt.hashSync(password, salt);
-  const newUser = await this.create({name, email, hashedPassword});
+  const newUser = await this.create({username, email, hashedPassword});
   return newUser;
+})
+
+
+UserSchema.static('authenticate', async function authenticate(username: string, password: string) : Promise<IUser> {
+  const queryResult = this.find({username});
+  if (!queryResult) throw UserNotFoundErr;
+  else {
+    const foundUser = queryResult[0];
+    if (bcrypt.compareSync(password, foundUser.hashedPassword)) {
+      return foundUser;
+    } else throw InvalidPasswordErr;
+  }
 })
 
 
