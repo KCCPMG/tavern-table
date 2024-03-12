@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { UserNotFoundErr, InvalidPasswordErr } from "app/utils/NextError";
+import { UserNotFoundErr, InvalidPasswordErr } from "@/lib/NextError";
 
 const salt_rounds = process.env.NODE_ENV === "production" ? 12 : 1;
 const salt = bcrypt.genSaltSync(salt_rounds);
@@ -75,7 +75,7 @@ UserSchema.static('register', async function register({username, email, password
 
 
 UserSchema.static('authenticate', async function authenticate(username: string, password: string) : Promise<IUser> {
-  const queryResult = this.find({username});
+  const queryResult = await this.find({username});
   if (!queryResult) throw UserNotFoundErr;
   else {
     const foundUser = queryResult[0];

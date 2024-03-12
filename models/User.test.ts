@@ -10,7 +10,7 @@ const newUserDetails: RequiredUserValues = {
 }
 
 const createdUserDetails= {  
-  name: "testUser",
+  username: "testUser",
   email: "testUser@aol.com",
 }
 
@@ -55,6 +55,21 @@ describe("A user", function() {
       }
       expect(foundUser).toHaveProperty(key);
       expect(foundUser[key]).toBe(val);
+
+    }
+  })
+
+  test("can be authenticated", async function() {
+    const foundUser: IUser = await User.authenticate(newUserDetails.username, newUserDetails.password);
+
+    const indexableFoundUser: {[index: string]: any} = foundUser;
+    for (let [key, val] of Object.entries(newUserDetails)) {
+      
+      if (key === "password") {
+        continue;
+      }
+      expect(indexableFoundUser).toHaveProperty(key);
+      expect(indexableFoundUser[key]).toBe(val);
 
     }
   })
