@@ -4,6 +4,7 @@ import User, { RequiredUserValues, IUser } from "./User";
 import Thread from "./Thread";
 import Campaign, { ICampaign } from "./Campaign";
 import { THREAD_CHAT_TYPES } from "./constants";
+import { sampleUser1Details } from "./test_resources/sampleDocs";
 
 type RequiredCampaignValues = {
   name: string,
@@ -15,12 +16,6 @@ const newCampaignDetails = {
   name: "Test Campaign",
 } as RequiredCampaignValues;
 
-const newUserDetails: RequiredUserValues = {  
-  username: "testUser",
-  email: "testUser@aol.com",
-  password: "testPassword"
-};
-
 const newThreadDetails = {
   name: "test",
   chatType: THREAD_CHAT_TYPES.CAMPAIGN
@@ -29,11 +24,11 @@ const newThreadDetails = {
 beforeAll(async function() {
   await mongooseConnect();
   await Promise.all([
-    User.deleteMany(newUserDetails),
+    User.deleteMany({username: sampleUser1Details.username}),
     Thread.deleteMany(newThreadDetails)
   ]);
   const [newUser, newThread]: Array<IUser> = await Promise.all([ 
-    User.register(newUserDetails),
+    User.register(sampleUser1Details),
     Thread.create(newThreadDetails)
   ]);
   newCampaignDetails.createdBy = newUser._id;
@@ -44,7 +39,7 @@ beforeAll(async function() {
 afterAll(async function() {
   await Promise.all([
     Campaign.deleteMany(newCampaignDetails),
-    User.deleteMany(newUserDetails),
+    User.deleteMany({username: sampleUser1Details.username}),
     Thread.deleteMany(newThreadDetails)
   ]);
   mongoose.disconnect();
