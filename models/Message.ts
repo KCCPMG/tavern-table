@@ -20,6 +20,8 @@ export interface IMessage {
   readBy: Array<mongoose.Types.ObjectId>
 }
 
+export type MessageType = typeof MESSAGE_TYPE_ARR[number];
+
 const Message = new mongoose.Schema({
   sender: {
     type: mongoose.Types.ObjectId,

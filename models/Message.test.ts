@@ -1,20 +1,9 @@
 import mongoose from 'mongoose';
 import Thread from "./Thread";
-import Message, { IMessage } from "./Message";
-import { MESSAGE_TYPES, THREAD_CHAT_TYPES } from "./constants";
+import Message, { IMessage, MessageType } from "./Message";
+import { MESSAGE_TYPES, THREAD_CHAT_TYPES, ChatTypes } from "./constants";
 import User, { RequiredUserValues, IUser } from "./User";
 import mongooseConnect from '@/lib/mongooseConnect';
-
-
-const MESSAGE_TYPE_ARRAY = Object.values(MESSAGE_TYPES);
-
-
-const { TEXT_ONLY } = MESSAGE_TYPES;
-const { CHAT, ROOM, CAMPAIGN } = THREAD_CHAT_TYPES;
-const THREAD_CHAT_TYPES_ARRAY: string[] = [CHAT, ROOM, CAMPAIGN] as const;
-
-type ChatTypes = typeof THREAD_CHAT_TYPES_ARRAY[number]
-type MessageType = typeof MESSAGE_TYPE_ARRAY[number];
 
 
 type RequiredThreadValues = {
@@ -43,12 +32,12 @@ const secondUserDetails: RequiredUserValues = {
 }
 
 const newThreadDetails = {
-  chatType: CHAT,
+  chatType: THREAD_CHAT_TYPES.CHAT,
   name: "test-chat"
 } as RequiredThreadValues;
 
 const newMessageDetails = {
-  messageType: TEXT_ONLY,
+  messageType: MESSAGE_TYPES.TEXT_ONLY,
   text: "hello, this is a chat message"
 } as RequiredMessageValues;
 

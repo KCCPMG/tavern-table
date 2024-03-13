@@ -1,17 +1,12 @@
 import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
 import User, {IUser, RequiredUserValues} from "./User";
+import { sampleUser1Details } from "./test_resources/sampleDocs";
 
-
-const newUserDetails: RequiredUserValues = {  
-  username: "testUser",
-  email: "testUser@aol.com",
-  password: "testPassword"
-}
 
 const createdUserDetails= {  
-  username: "testUser",
-  email: "testUser@aol.com",
+  username: sampleUser1Details.username,
+  email: sampleUser1Details.email
 }
 
 beforeAll(async function() {
@@ -28,12 +23,12 @@ describe("A user", function() {
 
   test("can be registered", async function() {
 
-    const newUser: IUser = await User.register(newUserDetails);
+    const newUser: IUser = await User.register(sampleUser1Details);
     
     // make returned IUser obj indexable by string
     const indexableNewUser:{[index: string]: any} = newUser;
 
-    for (let [key, val] of Object.entries(newUserDetails)) {
+    for (let [key, val] of Object.entries(sampleUser1Details)) {
       
       if (key === "password") {
         continue;
@@ -48,7 +43,7 @@ describe("A user", function() {
     const foundUsers: {[index: string]: IUser }[] = await User.find(createdUserDetails);
     expect(foundUsers.length).toBe(1);
     const foundUser = foundUsers[0];
-    for (let [key, val] of Object.entries(newUserDetails)) {
+    for (let [key, val] of Object.entries(sampleUser1Details)) {
       
       if (key === "password") {
         continue;
@@ -60,10 +55,10 @@ describe("A user", function() {
   })
 
   test("can be authenticated", async function() {
-    const foundUser: IUser = await User.authenticate(newUserDetails.username, newUserDetails.password);
+    const foundUser: IUser = await User.authenticate(sampleUser1Details.username, sampleUser1Details.password);
 
     const indexableFoundUser: {[index: string]: any} = foundUser;
-    for (let [key, val] of Object.entries(newUserDetails)) {
+    for (let [key, val] of Object.entries(sampleUser1Details)) {
       
       if (key === "password") {
         continue;

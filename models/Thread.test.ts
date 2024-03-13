@@ -1,30 +1,25 @@
 import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
-import Thread, { IThread } from "./Thread";
-import { THREAD_CHAT_TYPES, ChatTypes } from "./constants";
+import Thread, { IThread, RequiredThreadValues } from "./Thread";
+import { THREAD_CHAT_TYPES } from "./constants";
 
 
 const { CHAT, ROOM, CAMPAIGN } = THREAD_CHAT_TYPES;
 
-type RequiredThreadValues = {
-  name: string,
-  chatType: ChatTypes
-}
-
 const newChatThreadDetails: RequiredThreadValues = {
   name: "test",
   chatType: CHAT
-}
+} as RequiredThreadValues;
 
 const newRoomThreadDetails: RequiredThreadValues = {
   name: "test",
   chatType: ROOM
-}
+} as RequiredThreadValues;
 
 const newCampaignThreadDetails: RequiredThreadValues = {
   name: "test",
   chatType: CAMPAIGN
-}
+} as RequiredThreadValues;
 
 
 beforeAll(async function() {

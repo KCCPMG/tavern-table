@@ -2,52 +2,37 @@ import mongoose from "mongoose";
 import mongooseConnect from "@/lib/mongooseConnect"
 import Handout,{ IHandout, RequiredHandoutValues } from "./Handout";
 import Campaign, { ICampaign } from "./Campaign";
-import User, { IUser, RequiredUserValues } from "./User";
-import Thread, { IThread, RequiredThreadValues } from "./Thread";
-import { THREAD_CHAT_TYPES, ChatTypes } from "./constants";
-import { sampleUser1Details } from "./test_resources/sampleDocs";
+import User, { IUser } from "./User";
+import Thread, { IThread } from "./Thread";
+import { sampleUser1Details, sampleCampaignDetails, sampleCampaignThreadDetails } from "./test_resources/sampleDocs";
 
 import fs from "fs";
 
-const { CHAT, ROOM, CAMPAIGN } = THREAD_CHAT_TYPES;
-const THREAD_CHAT_TYPES_ARRAY: string[] = [CHAT, ROOM, CAMPAIGN] as const;
-
 const bufImage: Buffer = Buffer.from(fs.readFileSync('models/test_resources/sample.jpg'));
 
-
-type RequiredCampaignValues = {
-  name: string,
-  threadId: mongoose.Types.ObjectId,
-  createdBy?: mongoose.Types.ObjectId
-}
-
-
-const newThreadDetails: RequiredThreadValues = {
-  name: "test",
-  chatType: CAMPAIGN,
-  participants: []
-}
-
-const newCampaignDetails = {
-  name: "Test Campaign",
-} as RequiredCampaignValues;
 
 const newHandoutDetails = {
   handoutTitle: "Test Handout",
   image: bufImage
 } as RequiredHandoutValues;
 
+
 beforeAll(async function() {
   await mongooseConnect();
-
+  await Promise.all([
+    User.deleteMany({username: sampleUser1Details.username}),
+    Thread.deleteMany(sampleCampaignThreadDetails),
+    Campaign.deleteMany(sampleCampaignDetails),
+    Handout.deleteMany(newHandoutDetails)
+  ])
 })
 
 
 afterAll(async function() {
   await Promise.all([
     User.deleteMany({username: sampleUser1Details.username}),
-    Thread.deleteMany(newThreadDetails),
-    Campaign.deleteMany(newCampaignDetails),
+    Thread.deleteMany(sampleCampaignThreadDetails),
+    Campaign.deleteMany(sampleCampaignDetails),
     Handout.deleteMany(newHandoutDetails)
   ])
   mongoose.disconnect();
@@ -59,12 +44,12 @@ describe("A handout", function() {
   test("can be created", async function() {
     const newUser: IUser = await User.register(sampleUser1Details);
 
-    newThreadDetails.participants.push(newUser._id);
-    const newThread: IThread = await Thread.create(newThreadDetails);
+    sampleCampaignThreadDetails.participants.push(newUser._id);
+    const newThread: IThread = await Thread.create(sampleCampaignThreadDetails);
 
-    newCampaignDetails.createdBy = newUser._id;
-    newCampaignDetails.threadId = newThread._id;
-    const newCampaign: ICampaign = await Campaign.create(newCampaignDetails);
+    sampleCampaignDetails.createdBy = newUser._id;
+    sampleCampaignDetails.threadId = newThread._id;
+    const newCampaign: ICampaign = await Campaign.create(sampleCampaignDetails);
 
     newHandoutDetails.campaignId = newCampaign._id;
     newHandoutDetails.createdBy = newUser._id;
@@ -106,7 +91,6 @@ describe("A handout", function() {
 
   test("will not be retrieved", async function() {
     const foundHandouts: Array<IHandout> = await Handout.find(newHandoutDetails);
-
     expect(foundHandouts.length).toBe(0);
   })
 
