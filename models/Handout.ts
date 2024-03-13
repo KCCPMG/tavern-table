@@ -28,6 +28,13 @@ interface INote {
   }
 }
 
+export type RequiredHandoutValues = {
+  createdBy: mongoose.Types.ObjectId,
+  campaignId: mongoose.Types.ObjectId,
+  handoutTitle: string,
+  image: Buffer
+}
+
 const Handout = new mongoose.Schema({
   createdBy: {
     type: mongoose.Types.ObjectId,

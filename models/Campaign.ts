@@ -15,6 +15,12 @@ export interface ICampaign {
   threadId: mongoose.Types.ObjectId
 }
 
+export type RequiredCampaignValues = {
+  name: string,
+  threadId: mongoose.Types.ObjectId,
+  createdBy?: mongoose.Types.ObjectId
+}
+
 const Campaign = new mongoose.Schema({
   name: {
     type: String,

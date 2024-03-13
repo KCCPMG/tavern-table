@@ -1,16 +1,10 @@
 import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
-import User, { RequiredUserValues, IUser } from "./User";
+import User, { IUser } from "./User";
 import Thread from "./Thread";
-import Campaign, { ICampaign } from "./Campaign";
+import Campaign, { ICampaign, RequiredCampaignValues } from "./Campaign";
 import { THREAD_CHAT_TYPES } from "./constants";
 import { sampleUser1Details } from "./test_resources/sampleDocs";
-
-type RequiredCampaignValues = {
-  name: string,
-  threadId: mongoose.Types.ObjectId,
-  createdBy?: mongoose.Types.ObjectId
-}
 
 const newCampaignDetails = {
   name: "Test Campaign",

@@ -1,48 +1,11 @@
 import mongoose from "mongoose";
-import Campaign, { ICampaign } from "./Campaign";
-import User, { IUser, RequiredUserValues} from "./User";
+import Campaign, { ICampaign, RequiredCampaignValues } from "./Campaign";
+import User, { IUser } from "./User";
 import Thread, { IThread } from "./Thread";
-import JournalEntry, { IJournalEntry } from "./JournalEntry";
+import JournalEntry, { IJournalEntry, RequiredJournalEntryValues } from "./JournalEntry";
 import mongooseConnect from "@/lib/mongooseConnect";
-import { THREAD_CHAT_TYPES } from "./constants";
+import { sampleUser1Details, sampleCampaignThreadDetails, sampleCampaignDetails } from "./test_resources/sampleDocs";
 
-const { CHAT, ROOM, CAMPAIGN } = THREAD_CHAT_TYPES;
-const THREAD_CHAT_TYPES_ARRAY: string[] = [CHAT, ROOM, CAMPAIGN] as const;
-
-type ChatTypes = typeof THREAD_CHAT_TYPES_ARRAY[number]
-
-type RequiredCampaignValues = {
-  name: string,
-  threadId: mongoose.Types.ObjectId,
-  createdBy?: mongoose.Types.ObjectId
-}
-
-type RequiredThreadValues = {
-  name: string,
-  chatType: ChatTypes,
-  participants: Array<mongoose.Types.ObjectId>
-}
-
-type RequiredJournalEntryValues = {
-  campaignId: mongoose.Types.ObjectId,
-  createdBy: mongoose.Types.ObjectId
-}
-
-const newUserDetails: RequiredUserValues = {  
-  username: "testUser",
-  email: "testUser@aol.com",
-  password: "testPassword"
-};
-
-const newCampaignDetails = {
-  name: "Test Campaign",
-} as RequiredCampaignValues;
-
-const newThreadDetails: RequiredThreadValues = {
-  name: "test",
-  participants: [],
-  chatType: THREAD_CHAT_TYPES.CAMPAIGN
-}
 
 const newJournalEntryDetails = {
 
@@ -51,18 +14,18 @@ const newJournalEntryDetails = {
 beforeAll(async function() {
   await mongooseConnect();
   await Promise.all([
-    User.deleteMany(newUserDetails),
-    Campaign.deleteMany(newCampaignDetails),
-    Thread.deleteMany(newThreadDetails),
+    User.deleteMany({username: sampleUser1Details.username}),
+    Campaign.deleteMany(sampleCampaignDetails),
+    Thread.deleteMany(sampleCampaignThreadDetails),
     JournalEntry.deleteMany(newJournalEntryDetails)
   ]);
 })
 
 afterAll(async function() {
   await Promise.all([
-    User.deleteMany(newUserDetails),
-    Campaign.deleteMany(newCampaignDetails),
-    Thread.deleteMany(newThreadDetails),
+    User.deleteMany({username: sampleUser1Details.username}),
+    Campaign.deleteMany(sampleCampaignDetails),
+    Thread.deleteMany(sampleCampaignThreadDetails),
     JournalEntry.deleteMany(newJournalEntryDetails)
   ]);
   await mongoose.disconnect();
@@ -72,12 +35,12 @@ afterAll(async function() {
 describe("A JournalEntry", function() {
 
   test("can be created", async function() {
-    const newUser: IUser = await User.register(newUserDetails);
-    newThreadDetails.participants.push(newUser._id);
-    const newThread: IThread = await Thread.create(newThreadDetails);
-    newCampaignDetails.createdBy = newUser._id;
-    newCampaignDetails.threadId = newThread._id;
-    const newCampaign: ICampaign = await Campaign.create(newCampaignDetails);
+    const newUser: IUser = await User.register(sampleUser1Details);
+    sampleCampaignThreadDetails.participants.push(newUser._id);
+    const newThread: IThread = await Thread.create(sampleCampaignThreadDetails);
+    sampleCampaignDetails.createdBy = newUser._id;
+    sampleCampaignDetails.threadId = newThread._id;
+    const newCampaign: ICampaign = await Campaign.create(sampleCampaignDetails);
     newJournalEntryDetails.campaignId = newCampaign._id;
     newJournalEntryDetails.createdBy = newUser._id;
 

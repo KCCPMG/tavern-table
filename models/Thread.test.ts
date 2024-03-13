@@ -1,14 +1,10 @@
 import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
 import Thread, { IThread } from "./Thread";
-import { THREAD_CHAT_TYPES } from "./constants";
+import { THREAD_CHAT_TYPES, ChatTypes } from "./constants";
 
 
 const { CHAT, ROOM, CAMPAIGN } = THREAD_CHAT_TYPES;
-const THREAD_CHAT_TYPES_ARRAY: string[] = [CHAT, ROOM, CAMPAIGN] as const;
-
-
-type ChatTypes = typeof THREAD_CHAT_TYPES_ARRAY[number]
 
 type RequiredThreadValues = {
   name: string,

@@ -10,6 +10,11 @@ export interface IJournalEntry {
   text: string,
 }
 
+export type RequiredJournalEntryValues = {
+  campaignId: mongoose.Types.ObjectId,
+  createdBy: mongoose.Types.ObjectId
+}
+
 const JournalEntry = new mongoose.Schema({
   campaignId: {
     type: mongoose.Types.ObjectId,

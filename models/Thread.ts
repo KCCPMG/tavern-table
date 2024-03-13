@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { THREAD_CHAT_TYPES } from './constants';
+import { THREAD_CHAT_TYPES, ChatTypes } from './constants';
 
 const THREAD_CHAT_TYPES_ARRAY = Object.values(THREAD_CHAT_TYPES);
 
@@ -9,6 +9,12 @@ export interface IThread {
   chatType: typeof THREAD_CHAT_TYPES_ARRAY[number],
   campaignId?: mongoose.Types.ObjectId,
   name?: string
+}
+
+export type RequiredThreadValues = {
+  name: string,
+  chatType: ChatTypes,
+  participants: Array<mongoose.Types.ObjectId>
 }
 
 const Thread = new mongoose.Schema({

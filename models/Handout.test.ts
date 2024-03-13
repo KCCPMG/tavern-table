@@ -1,32 +1,19 @@
 import mongoose from "mongoose";
 import mongooseConnect from "@/lib/mongooseConnect"
-import Handout,{ IHandout } from "./Handout";
+import Handout,{ IHandout, RequiredHandoutValues } from "./Handout";
 import Campaign, { ICampaign } from "./Campaign";
-import User, { IUser } from "./User";
-import Thread, { ThreadType } from "./Thread";
-import { THREAD_CHAT_TYPES } from "./constants";
+import User, { IUser, RequiredUserValues } from "./User";
+import Thread, { IThread, RequiredThreadValues } from "./Thread";
+import { THREAD_CHAT_TYPES, ChatTypes } from "./constants";
+import { sampleUser1Details } from "./test_resources/sampleDocs";
 
 import fs from "fs";
 
 const { CHAT, ROOM, CAMPAIGN } = THREAD_CHAT_TYPES;
 const THREAD_CHAT_TYPES_ARRAY: string[] = [CHAT, ROOM, CAMPAIGN] as const;
 
-type ChatTypes = typeof THREAD_CHAT_TYPES_ARRAY[number]
-
 const bufImage: Buffer = Buffer.from(fs.readFileSync('models/test_resources/sample.jpg'));
 
-
-type RequiredUserValues = {
-  name: string,
-  email: string,
-  password: string
-}
-
-type RequiredThreadValues = {
-  name: string,
-  chatType: ChatTypes,
-  participants: Array<mongoose.Types.ObjectId>
-}
 
 type RequiredCampaignValues = {
   name: string,
@@ -34,18 +21,6 @@ type RequiredCampaignValues = {
   createdBy?: mongoose.Types.ObjectId
 }
 
-type RequiredHandoutValues = {
-  createdBy: mongoose.Types.ObjectId,
-  campaignId: mongoose.Types.ObjectId,
-  handoutTitle: string,
-  image: Buffer
-}
-
-const newUserDetails: RequiredUserValues = {  
-  name: "testUser",
-  email: "testUser@aol.com",
-  password: "testPassword"
-};
 
 const newThreadDetails: RequiredThreadValues = {
   name: "test",
@@ -70,7 +45,7 @@ beforeAll(async function() {
 
 afterAll(async function() {
   await Promise.all([
-    User.deleteMany(newUserDetails),
+    User.deleteMany({username: sampleUser1Details.username}),
     Thread.deleteMany(newThreadDetails),
     Campaign.deleteMany(newCampaignDetails),
     Handout.deleteMany(newHandoutDetails)
@@ -82,10 +57,10 @@ afterAll(async function() {
 describe("A handout", function() {
 
   test("can be created", async function() {
-    const newUser: IUser = await User.register(newUserDetails);
+    const newUser: IUser = await User.register(sampleUser1Details);
 
     newThreadDetails.participants.push(newUser._id);
-    const newThread: ThreadType = await Thread.create(newThreadDetails);
+    const newThread: IThread = await Thread.create(newThreadDetails);
 
     newCampaignDetails.createdBy = newUser._id;
     newCampaignDetails.threadId = newThread._id;

@@ -22,3 +22,9 @@ export const MESSAGE_TYPES: {[index: string]: string} = {
   STEP_DOWN_DM: 'STEP_DOWN_DM',
   TEXT_ONLY: 'TEXT_ONLY',
 }
+
+const { CHAT, ROOM, CAMPAIGN } = THREAD_CHAT_TYPES;
+const THREAD_CHAT_TYPES_ARRAY: string[] = [CHAT, ROOM, CAMPAIGN] as const;
+
+
+export type ChatTypes = typeof THREAD_CHAT_TYPES_ARRAY[number]
