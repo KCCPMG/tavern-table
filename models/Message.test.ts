@@ -1,35 +1,11 @@
 import mongoose from 'mongoose';
-import Thread from "./Thread";
-import Message, { IMessage, MessageType } from "./Message";
+import Thread, { RequiredThreadValues } from "./Thread";
+import Message, { IMessage, RequiredMessageValues } from "./Message";
 import { MESSAGE_TYPES, THREAD_CHAT_TYPES, ChatTypes } from "./constants";
-import User, { RequiredUserValues, IUser } from "./User";
+import User, { IUser } from "./User";
 import mongooseConnect from '@/lib/mongooseConnect';
+import { sampleUser1Details, sampleUser2Details } from "./test_resources/sampleDocs";
 
-
-type RequiredThreadValues = {
-  name: string,
-  chatType: ChatTypes,
-  participants: Array<mongoose.Types.ObjectId>
-}
-
-type RequiredMessageValues = {
-  sender: mongoose.Types.ObjectId,
-  threadIds: Array<mongoose.Types.ObjectId>,
-  messageType: MessageType,
-  text: string
-}
-
-const firstUserDetails: RequiredUserValues = {  
-  username: "testUser1",
-  email: "testUser@aol.com",
-  password: "testPassword"
-};
-
-const secondUserDetails: RequiredUserValues = {
-  username: "testUser2",
-  email: "testUser@aol.com",
-  password: "testPassword"
-}
 
 const newThreadDetails = {
   chatType: THREAD_CHAT_TYPES.CHAT,
@@ -45,8 +21,8 @@ const newMessageDetails = {
 beforeAll(async function() {
   await mongooseConnect();
   await Promise.all([
-    User.deleteMany(firstUserDetails),
-    User.deleteMany(secondUserDetails),
+    User.deleteMany({username: sampleUser1Details.username}),
+    User.deleteMany({username: sampleUser2Details.username}),
     Thread.deleteMany(newThreadDetails),
     Message.deleteMany(newMessageDetails)
   ]);
@@ -54,8 +30,8 @@ beforeAll(async function() {
 
 afterAll(async function() {
   await Promise.all([
-    User.deleteMany(firstUserDetails),
-    User.deleteMany(secondUserDetails),
+    User.deleteMany({username: sampleUser1Details.username}),
+    User.deleteMany({username: sampleUser2Details.username}),
     Thread.deleteMany(newThreadDetails),
     Message.deleteMany(newMessageDetails)
   ]);
@@ -69,8 +45,8 @@ describe("A message", function(){
   test("can be created", async function() {
     
     const [firstUser, secondUser]: Array<IUser> = await Promise.all([
-      User.register(firstUserDetails),
-      User.register(secondUserDetails)
+      User.register(sampleUser1Details),
+      User.register(sampleUser2Details)
     ]);
 
     newThreadDetails.participants = [firstUser._id, secondUser._id];

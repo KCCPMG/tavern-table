@@ -22,6 +22,13 @@ export interface IMessage {
 
 export type MessageType = typeof MESSAGE_TYPE_ARR[number];
 
+export type RequiredMessageValues = {
+  sender: mongoose.Types.ObjectId,
+  threadIds: Array<mongoose.Types.ObjectId>,
+  messageType: MessageType,
+  text: string
+}
+
 const Message = new mongoose.Schema({
   sender: {
     type: mongoose.Types.ObjectId,

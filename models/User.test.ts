@@ -1,6 +1,6 @@
 import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
-import User, {IUser, RequiredUserValues} from "./User";
+import User, { IUser } from "./User";
 import { sampleUser1Details } from "./test_resources/sampleDocs";
 
 
