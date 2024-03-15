@@ -20,7 +20,8 @@
       "@/pages/*": ["pages/*"],
       "@/styles/*": ["styles/*"],
       "@/lib/*": ["lib/*"],
-      "@/models/*": ["models/*"]
+      "@/models/*": ["models/*"],
+      "@/api/*": ["app/api/*"]
     },
     "plugins": [
       {

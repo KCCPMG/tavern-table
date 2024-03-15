@@ -4,6 +4,13 @@ import User from 'types/User';
 
 
 export const authOptions: NextAuthOptions = {
+  pages: {
+    signIn: '/signin',
+    signOut: '/auth/signout',
+    error: '/auth/error',
+    verifyRequest: '/auth/verify-request',
+    newUser: '/auth/new-user'
+  },
   providers: [
     CredentialsProvider({
       name: "Credentials",
