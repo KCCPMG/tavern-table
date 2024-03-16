@@ -1,9 +1,14 @@
+import User from '@/models/User';
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import User from 'types/User';
-
+// import User from 'types/User';
+// import { MongoDBAdapter } from "@auth/mongodb-adapter"
+// import clientPromise from "../../../lib/mongodb"
 
 export const authOptions: NextAuthOptions = {
+  // adapter: {
+  //   MongoDBAdapter(clientPromise);
+  // },
   pages: {
     signIn: '/signin',
     signOut: '/auth/signout',
@@ -27,8 +32,11 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials, request): Promise<any> {
 
-        console.log("\ntest from CredentialsProvider authorize");
-        const user = { id: "1", username: "J Smith", email: "jsmith@example.com", testProperty: "test" }
+        // console.log("\ntest from CredentialsProvider authorize");
+        // const user = { id: "1", username: "J Smith", email: "jsmith@example.com", testProperty: "test" }
+
+        console.log("hello am I alive");
+        const user = await User.authenticate(credentials!.username, credentials!.password);
 
         if (user) {
           // Any object returned will be saved in `user` property of the JWT
