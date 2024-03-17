@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { UserNotFoundErr, InvalidPasswordErr } from "@/lib/NextError";
+import { UserNotFoundErr, InvalidPasswordErr, EmailTakenErr, UsernameTakenErr } from "@/lib/NextError";
 
 const salt_rounds = process.env.NODE_ENV === "production" ? 12 : 1;
 const salt = bcrypt.genSaltSync(salt_rounds);
@@ -32,7 +32,8 @@ export const UserSchema = new mongoose.Schema<IUser>({
   },
   email: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   hashedPassword: {
     type: String,
@@ -70,8 +71,23 @@ export interface UserModel extends mongoose.Model<IUser> {
 
 UserSchema.static('register', async function register({username, email, password} : RequiredUserValues) : Promise<IUser> {
   const hashedPassword = bcrypt.hashSync(password, salt);
-  const newUser = await this.create({username, email, hashedPassword});
-  return newUser;
+  try {
+    const newUser = await this.create({username, email, hashedPassword});
+    return newUser;
+  } catch(err) {
+    // console.log(err);
+    // console.log(err.code);
+    // console.log(Object.keys(err));
+    if (err.code === 11000) {
+      if (err.keyPattern?.email) {
+        throw EmailTakenErr;
+      } if (err.keyPattern?.username) {
+        throw UsernameTakenErr;
+      }
+    }
+    throw(err);
+  }
+
 })
 
 
@@ -82,7 +98,10 @@ UserSchema.static('authenticate', async function authenticate(username: string, 
     const foundUser = queryResult[0];
     if (bcrypt.compareSync(password, foundUser.hashedPassword)) {
       return foundUser;
-    } else throw InvalidPasswordErr;
+    } else {
+      console.log(password);
+      throw InvalidPasswordErr;
+    }
   }
 })
 

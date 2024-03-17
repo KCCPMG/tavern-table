@@ -2,6 +2,7 @@ import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
 import User, { IUser } from "./User";
 import { sampleUser1Details } from "./test_resources/sampleDocs";
+import { EmailTakenErr, UsernameTakenErr } from "@/lib/NextError";
 
 
 const createdUserDetails= {  
@@ -12,10 +13,14 @@ const createdUserDetails= {
 beforeAll(async function() {
   await mongooseConnect();
   await User.deleteMany(createdUserDetails);
+  await User.deleteMany({username: "bad user"});
+  await User.deleteMany({email: "baduser@aol.com"});
 })
 
 afterAll(async function(){
-  await User.deleteMany(createdUserDetails);
+  // await User.deleteMany(createdUserDetails);
+  // await User.deleteMany({username: "bad user"});
+  // await User.deleteMany({email: "baduser@aol.com"});
   mongoose.disconnect();
 })
 
@@ -67,6 +72,24 @@ describe("A user", function() {
       expect(indexableFoundUser[key]).toBe(val);
 
     }
+  })
+
+  test("cannot be created with a duplicate email", async function() {
+    expect(await User.register({
+      email: sampleUser1Details.email,
+      username: "bad user",
+      password: "testpassword"
+    })).toThrow(EmailTakenErr.message)
+
+  })
+
+  test("cannot be created with a duplicate username", async function() {
+    expect(await User.register({
+      email: "baduser@aol.com",
+      username: sampleUser1Details.username,
+      password: "testpassword"
+    })).toThrow(UsernameTakenErr.message)
+
   })
   
   test("can be deleted", async function() {

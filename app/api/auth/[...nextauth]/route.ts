@@ -36,6 +36,7 @@ export const authOptions: NextAuthOptions = {
         // const user = { id: "1", username: "J Smith", email: "jsmith@example.com", testProperty: "test" }
 
         console.log("hello am I alive");
+        console.log(credentials);
         const user = await User.authenticate(credentials!.username, credentials!.password);
 
         if (user) {

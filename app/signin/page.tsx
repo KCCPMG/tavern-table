@@ -9,7 +9,7 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 
 
-export default async function SignIn() {
+export default function SignIn() {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -21,6 +21,7 @@ export default async function SignIn() {
       onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         signIn("credentials", {
+          newUser: true, // this can be done, but converts to a string, and the credentials argument in authorize is already defined
           username,
           password
         }) 
