@@ -75,11 +75,13 @@ UserSchema.static('register', async function register({username, email, password
     const newUser = await this.create({username, email, hashedPassword});
     return newUser;
   } catch(err) {
-    if (err.code === 11000) {
-      if (err.keyPattern?.email) {
-        throw EmailTakenErr;
-      } if (err.keyPattern?.username) {
-        throw UsernameTakenErr;
+    if (err instanceof mongoose.mongo.MongoServerError) {
+      if (err.code === 11000) {
+        if (err.keyPattern?.email) {
+          throw EmailTakenErr;
+        } if (err.keyPattern?.username) {
+          throw UsernameTakenErr;
+        }
       }
     }
     throw(err);
