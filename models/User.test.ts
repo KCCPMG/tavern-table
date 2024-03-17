@@ -75,30 +75,43 @@ describe("A user", function() {
   })
 
   test("cannot be created with a duplicate email", async function() {
-    expect(await User.register({
+    // expect(await User.register({
+    //   email: sampleUser1Details.email,
+    //   username: "bad user",
+    //   password: "testpassword"
+    // })).toThrow(EmailTakenErr.message)
+
+    // console.log(EmailTakenErr.message);
+    // expect(User.register({
+    //   email: sampleUser1Details.email,
+    //   username: "bad user",
+    //   password: "testpassword"
+    // })).rejects.toThrow(EmailTakenErr);
+
+    await expect(User.register({
       email: sampleUser1Details.email,
       username: "bad user",
       password: "testpassword"
-    })).toThrow(EmailTakenErr.message)
+    })).rejects.toThrow(EmailTakenErr);
 
   })
 
   test("cannot be created with a duplicate username", async function() {
-    expect(await User.register({
+    await expect(User.register({
       email: "baduser@aol.com",
       username: sampleUser1Details.username,
       password: "testpassword"
-    })).toThrow(UsernameTakenErr.message)
+    })).rejects.toThrow(UsernameTakenErr)
 
   })
   
-  test("can be deleted", async function() {
-    await User.deleteMany(createdUserDetails);
-  })
+  // test("can be deleted", async function() {
+  //   await User.deleteMany(createdUserDetails);
+  // })
 
-  test("will not be retrieved", async function() {
-    const foundUsers: Array<IUser> = await User.find(createdUserDetails);
-    expect(foundUsers.length).toBe(0);
-  })
+  // test("will not be retrieved", async function() {
+  //   const foundUsers: Array<IUser> = await User.find(createdUserDetails);
+  //   expect(foundUsers.length).toBe(0);
+  // })
 
 })

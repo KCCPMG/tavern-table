@@ -106,7 +106,7 @@ UserSchema.static('authenticate', async function authenticate(username: string, 
 })
 
 
-export default  mongoose.models.User as UserModel || mongoose.model<IUser, UserModel>("User", UserSchema);
+export default mongoose.models.User as UserModel || mongoose.model<IUser, UserModel>("User", UserSchema);
 
 
 
