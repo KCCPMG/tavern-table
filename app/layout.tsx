@@ -20,7 +20,7 @@ export default async function RootLayout({ children }: PropsType) {
   return (
     <html lang="en">
       <AuthProvider>
-        <body>
+        <body className="h-screen">
           <Navbar user={session?.user}/>
           <h1 className="text-3xl font-bold underline">text-3xl font-bold underline</h1>
           {children}

@@ -14,7 +14,7 @@ export const authOptions: NextAuthOptions = {
     signOut: '/auth/signout',
     error: '/auth/error',
     verifyRequest: '/auth/verify-request',
-    newUser: '/auth/new-user'
+    newUser: '/register'
   },
   providers: [
     CredentialsProvider({
