@@ -14,12 +14,12 @@ type FormFieldProps = {
 
 function FormField({labelText, inputType, inputPlaceholder, inputValue, inputChange} : FormFieldProps) {
   return (
-    <div className="flex justify-between">  
+    <div className="flex justify-between pt-1">  
       <label className="">
         {labelText}
       </label>
       <input 
-        className="border-black border-2"
+        className="border-black border p-1"
         type={inputType} 
         placeholder={inputPlaceholder} 
         value={inputValue} 
@@ -36,6 +36,17 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  async function submitRegistration(): Promise<void> {
+    const response = await fetch('/api/register', {
+      headers: {
+        contentType: "application/json"
+      },
+      method: 'POST',
+      body: JSON.stringify({email, username, password}),
+    })
+    console.log(response.json());
+  }
+
   return (
     <div className="container m-auto translate-y-2/4 border-2 p-4 max-w-96">
       <form 
@@ -44,10 +55,12 @@ export default function Register() {
         // className="block px-auto"
         onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
           e.preventDefault();
-          signIn("credentials", {
-            username,
-            password
-          }) 
+          submitRegistration();
+          // signIn("credentials", {
+          //   username,
+          //   password
+          // })
+
         }}
       >
         <FormField
@@ -78,7 +91,14 @@ export default function Register() {
           inputValue={confirmPassword}
           inputChange={(e) => setConfirmPassword(e.target.value)}
         />
-        <button type="submit">Sign In</button>
+        <div className="flex pt-4 justify-between">
+          <button 
+            className="border px-2 mx-auto"
+            type="submit"
+          >
+            Register
+          </button>
+        </div>
       </form>
     </div>
   )
