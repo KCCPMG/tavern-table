@@ -37,6 +37,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   async function submitRegistration(): Promise<void> {
+    console.log("body should be...", JSON.stringify({email, username, password}));
     const response = await fetch('/api/register', {
       headers: {
         contentType: "application/json"
@@ -44,7 +45,8 @@ export default function Register() {
       method: 'POST',
       body: JSON.stringify({email, username, password}),
     })
-    console.log(response.json());
+    const json = await response.json();
+    console.log(json);
   }
 
   return (
