@@ -29,6 +29,20 @@
       }
     ]
   },
+  "ts-node": {
+    "esm": true,
+    "compilerOptions": {
+      "module": "nodenext",
+    },
+    "paths": {
+      "@/components/*": ["components/*"],
+      "@/pages/*": ["pages/*"],
+      "@/styles/*": ["styles/*"],
+      "@/lib/*": ["lib/*"],
+      "@/models/*": ["models/*"],
+      "@/api/*": ["app/api/*"]
+    },
+  },
   "include": [
     "next-env.d.ts",
     "**/*.ts",

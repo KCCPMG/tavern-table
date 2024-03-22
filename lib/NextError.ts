@@ -7,6 +7,7 @@ export class NextError extends Error {
 
   constructor(message: string, status: number) {
     super(message);
+    this.name = NextError.name;
     this.message = message;
     this.status = status;
   }

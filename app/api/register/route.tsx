@@ -1,11 +1,12 @@
 "use server"
 
 import User from "models/User";
-import { NextError } from "@/lib/NextError";
+import { UsernameTakenErr, EmailTakenErr, NextError } from "@/lib/NextError";
 import mongooseConnect from "@/lib/mongooseConnect";
 
 export async function POST(req: Request) {
   await mongooseConnect();
+  // console.log("UsernameTakenErr instanceof NextError", UsernameTakenErr instanceof NextError)
   const json = await req.json();
   const { username, email, password } = json;
   try {
@@ -15,9 +16,18 @@ export async function POST(req: Request) {
       password
     })
     return Response.json({ data: user });
-  } catch(err) {
-    console.log(err.message, err.status, err instanceof NextError);
-    if (err instanceof NextError) {
+  } catch(e) {
+    // console.log(
+    //   err.message, 
+    //   err.status, 
+    //   err == UsernameTakenErr,
+    //   err == EmailTakenErr,
+    //   err instanceof Error,
+    //   err instanceof NextError
+    // );
+    console.log((e as Error).name, NextError.name);
+    if ((e as any).name === NextError.name) {
+      const err = e as NextError;
       return new Response(err.message, {
         status: err.status
       })
