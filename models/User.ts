@@ -92,7 +92,7 @@ UserSchema.static('register', async function register({username, email, password
 
 UserSchema.static('authenticate', async function authenticate(username: string, password: string) : Promise<IUser> {
   const queryResult = await this.find({username});
-  if (!queryResult) throw UserNotFoundErr;
+  if (queryResult.length === 0) throw UserNotFoundErr;
   else {
     const foundUser = queryResult[0];
     if (bcrypt.compareSync(password, foundUser.hashedPassword)) {

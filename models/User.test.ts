@@ -2,7 +2,7 @@ import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
 import User, { IUser } from "./User";
 import { sampleUser1Details } from "./test_resources/sampleDocs";
-import { EmailTakenErr, UsernameTakenErr } from "@/lib/NextError";
+import { EmailTakenErr, InvalidPasswordErr, UserNotFoundErr, UsernameTakenErr } from "@/lib/NextError";
 
 
 const createdUserDetails= {  
@@ -72,6 +72,16 @@ describe("A user", function() {
       expect(indexableFoundUser[key]).toBe(val);
 
     }
+  })
+
+  test("will throw a UserNotFoundErr on false user authentication", async function() {
+    await expect(User.authenticate("fakeuser", "anyfakepassword"))
+    .rejects.toThrow(UserNotFoundErr);
+  })
+
+  test("will throw an InvalidPasswordErr on invalid password", async function() {
+    await expect(User.authenticate(sampleUser1Details.username, "badpassword"))
+    .rejects.toThrow(InvalidPasswordErr);
   })
 
   test("cannot be created with a duplicate email", async function() {
