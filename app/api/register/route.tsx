@@ -3,6 +3,7 @@
 import User from "models/User";
 import { NextError } from "@/lib/NextError";
 import mongooseConnect from "@/lib/mongooseConnect";
+import { getCsrfToken } from "next-auth/react";
 
 export async function POST(req: Request) {
   await mongooseConnect();
@@ -14,6 +15,7 @@ export async function POST(req: Request) {
       email,
       password
     })
+    // getCsrfToken?
     return Response.json({ data: user }, {
       status: 201
     });

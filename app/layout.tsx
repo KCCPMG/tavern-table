@@ -12,10 +12,10 @@ type PropsType = {
 export default async function RootLayout({ children }: PropsType) {
 
   const session = await getServerSession(authOptions);
-  console.log("Layout Session:", {session});
-  console.log("Layout:", session?.user);
+  // console.log("Layout Session:", {session});
+  // console.log("Layout:", session?.user);
 
-  console.log(session?.user.username); // why doesn't this work?
+  // console.log(session?.user.username); // why doesn't this work?
 
   return (
     <html lang="en">

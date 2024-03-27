@@ -35,7 +35,7 @@ type NavbarProps = {
 
 export default function Navbar({user} : any) {
 
-  console.log("Navbar:", user ? user : "no user");
+  // console.log("Navbar:", user ? user : "no user");
 
   return (
     <nav className="bg-black w-full p-2">

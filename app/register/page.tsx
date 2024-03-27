@@ -57,11 +57,13 @@ export default function Register() {
         // className="block px-auto"
         onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
           e.preventDefault();
-          submitRegistration();
-          // signIn("credentials", {
-          //   username,
-          //   password
-          // })
+          // submitRegistration();
+          signIn("credentials", {
+            register: true,
+            username,
+            email,
+            password
+          })
 
         }}
       >
