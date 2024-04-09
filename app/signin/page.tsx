@@ -3,6 +3,7 @@
 import FormField from "@/components/FormField";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import { UserNotFoundErr, InvalidPasswordErr } from "@/lib/NextError";
 
 
 export default function SignIn() {
@@ -13,14 +14,19 @@ export default function SignIn() {
   return (
     <div className="container m-auto translate-y-2/4 border-2 p-4 max-w-96">
       <form 
-        // method="post" 
-        // action="/api/auth/callback/credentials"
-        onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+        onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
           e.preventDefault();
-          signIn("credentials", {
-            username,
-            password
-          }) 
+          try {
+            const response = await signIn("credentials", {
+              redirect: false,
+              username,
+              password
+            }) 
+            console.log(response);
+
+          } catch(err) {
+            console.log("ERROR!!!", err);
+          }
         }}
       >
         <FormField
@@ -37,14 +43,6 @@ export default function SignIn() {
           inputChange={(e)=>setPassword(e.target.value)}
           inputValue={password}
         />
-        {/* <label>
-          Username
-          <input type="text" placeholder="Username" onChange={(e)=>setUsername(e.target.value)}/>
-        </label>
-        <label>
-          Password
-          <input type="password" placeholder="Password" onChange={(e)=>setPassword(e.target.value)}/>
-        </label> */}
         <button type="submit">Sign In</button>
       </form>
     </div>
