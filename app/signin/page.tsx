@@ -14,7 +14,7 @@ export default function SignIn() {
 
   return (
     <>
-      <Toaster toasts={[{errorMessage: "test", status: "success"}]}/>
+      <Toaster toasts={[{errorMessage: "test test test test test test test test test test test test", status: "success"}]}/>
       <div className="container m-auto translate-y-2/4 border-2 p-4 max-w-96">
         <form 
           onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
