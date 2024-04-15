@@ -4,6 +4,7 @@ import AuthProvider from "context/AuthProvider";
 import { getServerSession } from "next-auth/next";
 import User from "types/User";
 import { authOptions } from "./api/auth/[...nextauth]/route";
+import { ToasterContextProvider } from "context/ToastContext";
 
 type PropsType = {
   children: React.ReactNode
@@ -19,13 +20,15 @@ export default async function RootLayout({ children }: PropsType) {
 
   return (
     <html lang="en">
-      <AuthProvider>
-        <body className="h-screen">
-          <Navbar user={session?.user}/>
-          <h1 className="text-3xl font-bold underline">text-3xl font-bold underline</h1>
-          {children}
-        </body>
-      </AuthProvider>
+      <ToasterContextProvider>
+        <AuthProvider>
+          <body className="h-screen">
+            <Navbar user={session?.user}/>
+            <h1 className="text-3xl font-bold underline">text-3xl font-bold underline</h1>
+            {children}
+          </body>
+        </AuthProvider>
+      </ToasterContextProvider>
     </html>
   )
 }
