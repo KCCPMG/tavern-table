@@ -2,14 +2,12 @@
 
 import { ReactNode, Dispatch, useState, createContext, useContext, SetStateAction } from 'react';
 
-interface ToastProps {
+export interface ToastProps {
   message: string,
   status: 'error' | 'warning' | 'success'
 }
 
-
-
-type ToasterContextType = {
+export type ToasterContextType = {
   toasts: Array<ToastProps>,
   addToast: (toast: ToastProps) => void,
 }

@@ -2,9 +2,10 @@
 
 import FormField from "@/components/FormField";
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { UserNotFoundErr, InvalidPasswordErr } from "@/lib/NextError";
 import Toaster from "@/components/Toast";
+import { useToasterContext, ToasterContext, ToasterContextType } from "context/ToasterContext";
 
 
 export default function SignIn() {
@@ -12,15 +13,30 @@ export default function SignIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  const { addToast, toasts } = useToasterContext();
+
+  useEffect(() => {
+    addToast({
+      message: "hellooooooo",
+      status: "success"
+    });
+    
+  }, [])
+  
+  useEffect(() => {
+    console.log(toasts);
+    
+  }, [toasts]);
+
   return (
     <>
-      <Toaster toasts={[{errorMessage: "test test test test test test test test test test test test", status: "success"}]}/>
       <div className="container m-auto translate-y-2/4 border-2 p-4 max-w-96">
+        {/* <Toaster /> */}
         <form 
-          onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
+          onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
             try {
-              const response = await signIn("credentials", {
+              const response = signIn("credentials", {
                 redirect: false,
                 username,
                 password
