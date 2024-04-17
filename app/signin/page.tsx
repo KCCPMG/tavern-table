@@ -15,18 +15,18 @@ export default function SignIn() {
 
   const { addToast, toasts } = useToasterContext();
 
+  // example
   useEffect(() => {
     addToast({
-      message: "hellooooooo",
+      message: "toast message",
       status: "success"
     });
-    
   }, [])
   
-  useEffect(() => {
-    console.log(toasts);
-    
-  }, [toasts]);
+  // example:
+  // useEffect(() => {
+  //   console.log("toasts useEffect:", toasts);
+  // }, [toasts]);
 
   return (
     <>

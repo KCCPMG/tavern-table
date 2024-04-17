@@ -1,15 +1,22 @@
 "use client";
 
-import { ReactNode, Dispatch, useState, createContext, useContext, SetStateAction } from 'react';
+import { ReactNode, useState, createContext, useContext } from 'react';
 
-export interface ToastProps {
+export interface NewToastType {
   message: string,
   status: 'error' | 'warning' | 'success'
 }
 
+export interface ToastType extends NewToastType {
+  key: number
+}
+
+export type RemoveToastType = (toastKey: number) => void;
+
 export type ToasterContextType = {
-  toasts: Array<ToastProps>,
-  addToast: (toast: ToastProps) => void,
+  toasts: Array<ToastType>,
+  addToast: (toast: ToastType) => void,
+  removeToast: RemoveToastType
 }
 
 export const ToasterContext = createContext<ToasterContextType | null>(null);
@@ -32,18 +39,29 @@ export function ToasterContextProvider(
   { children }: ToasterContextProviderProps
 ) {
 
-  const [toasts, setToasts] = useState<Array<ToastProps>>([]);
+  const [toasts, setToasts] = useState<Array<ToastType>>([]);
+  const [nextKey, setNextKey] = useState(1);
 
-  const addToast = (toast: ToastProps) => {
+  const addToast = (toast: NewToastType) => {
     const toastCopies = [...toasts];
-    toastCopies.push(toast);
-    setToasts(toastCopies);
+    const assignedToast: ToastType = Object.assign({key: nextKey}, toast)
+    setNextKey(nextKey + 1);
+    toastCopies.push(assignedToast);
+    setToasts(toastCopies);    
   } 
+
+  const removeToast = (toastKey: number) => {
+    const toastCopies = [...toasts];
+    setToasts(toastCopies.filter((toast) => { 
+      return (toast.key !== toastKey);  
+    }))
+  }
 
   return (
     <ToasterContext.Provider value={{
       toasts,
-      addToast
+      addToast,
+      removeToast
     }}>
       {children}
     </ToasterContext.Provider>
