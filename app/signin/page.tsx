@@ -18,15 +18,23 @@ export default function SignIn() {
   // example
   useEffect(() => {
     addToast({
-      message: "toast message",
+      message: "toast 1",
+      status: "success"
+    });
+    addToast({
+      message: "toast 2",
+      status: "success"
+    });
+    addToast({
+      message: "toast 3",
       status: "success"
     });
   }, [])
   
   // example:
-  // useEffect(() => {
-  //   console.log("toasts useEffect:", toasts);
-  // }, [toasts]);
+  useEffect(() => {
+    console.log("toasts useEffect:", toasts);
+  }, [toasts]);
 
   return (
     <>

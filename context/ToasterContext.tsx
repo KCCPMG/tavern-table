@@ -8,14 +8,14 @@ export interface NewToastType {
 }
 
 export interface ToastType extends NewToastType {
-  key: number
+  toastKey: number
 }
 
 export type RemoveToastType = (toastKey: number) => void;
 
 export type ToasterContextType = {
   toasts: Array<ToastType>,
-  addToast: (toast: ToastType) => void,
+  addToast: (toast: NewToastType) => void,
   removeToast: RemoveToastType
 }
 
@@ -44,8 +44,8 @@ export function ToasterContextProvider(
 
   const addToast = (toast: NewToastType) => {
     const toastCopies = [...toasts];
-    const assignedToast: ToastType = Object.assign({key: nextKey}, toast)
-    setNextKey(nextKey + 1);
+    const assignedToast: ToastType = Object.assign({toastKey: nextKey}, toast)
+    setNextKey(nextKey => nextKey + 1);
     toastCopies.push(assignedToast);
     setToasts(toastCopies);    
   } 
@@ -53,7 +53,7 @@ export function ToasterContextProvider(
   const removeToast = (toastKey: number) => {
     const toastCopies = [...toasts];
     setToasts(toastCopies.filter((toast) => { 
-      return (toast.key !== toastKey);  
+      return (toast.toastKey !== toastKey);  
     }))
   }
 
