@@ -15,25 +15,36 @@ export default function SignIn() {
 
   const { addToast, toasts } = useToasterContext();
 
-  // example
-  useEffect(() => {
-    addToast({
-      message: "toast 1",
-      status: "success"
-    });
-    addToast({
-      message: "toast 2",
-      status: "success"
-    });
-    addToast({
-      message: "toast 3",
-      status: "success"
-    });
-  }, [])
-  
+
   // example:
+
+  const [addedToastOne, setAddedToastOne] = useState(false);
+  const [addedToastTwo, setAddedToastTwo] = useState(false);
+  const [addedToastThree, setAddedToastThree] = useState(false);
+
   useEffect(() => {
     console.log("toasts useEffect:", toasts);
+    if (!addedToastOne) {
+      addToast({
+        message: "toast 1",
+        status: "success"
+      });
+      setAddedToastOne(true);
+    }
+    else if (!addedToastTwo) {
+      addToast({
+        message: "toast 2",
+        status: "success"
+      });
+      setAddedToastTwo(true);
+    }
+    else if (!addedToastThree) {
+      addToast({
+        message: "toast 3",
+        status: "success"
+      })
+      setAddedToastThree(true);
+    }
   }, [toasts]);
 
   return (

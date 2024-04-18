@@ -43,16 +43,13 @@ export function ToasterContextProvider(
   const [nextKey, setNextKey] = useState(1);
 
   const addToast = (toast: NewToastType) => {
-    const toastCopies = [...toasts];
     const assignedToast: ToastType = Object.assign({toastKey: nextKey}, toast)
-    setNextKey(nextKey => nextKey + 1);
-    toastCopies.push(assignedToast);
-    setToasts(toastCopies);    
+    setNextKey(nextKey + 1);
+    setToasts([...toasts, assignedToast]);    
   } 
 
   const removeToast = (toastKey: number) => {
-    const toastCopies = [...toasts];
-    setToasts(toastCopies.filter((toast) => { 
+    setToasts(toasts.filter((toast) => { 
       return (toast.toastKey !== toastKey);  
     }))
   }
