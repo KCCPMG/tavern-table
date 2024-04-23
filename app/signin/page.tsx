@@ -6,6 +6,8 @@ import { useState, useEffect, useContext } from "react";
 import { UserNotFoundErr, InvalidPasswordErr } from "@/lib/NextError";
 import Toaster from "@/components/Toast";
 import { useToasterContext, ToasterContext, ToasterContextType } from "context/ToasterContext";
+import { redirect } from "next/dist/server/api-utils";
+import { navigateHome } from "app/actions";
 
 
 export default function SignIn() {
@@ -52,18 +54,43 @@ export default function SignIn() {
       <div className="container m-auto translate-y-2/4 border-2 p-4 max-w-96">
         {/* <Toaster /> */}
         <form 
-          onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+          onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
             try {
-              const response = signIn("credentials", {
+              const response = await signIn("credentials", {
                 redirect: false,
                 username,
                 password
               }) 
-              console.log(response);
+              console.log(response)
+              if (!response) {
+                throw new Error("Something went wrong");
+              }
+              // else, assured response is of type SignInResponse
+              if (response.error) {
+                console.log("response.error");
+                addToast({
+                  status: "error",
+                  message: response.error || "Something went wrong"
+                })
+              }
+              else if (response.status === 200 && response.ok) {
+                console.log("success");
+                addToast({
+                  status: "success",
+                  message: "Logged In!"
+                })
+                console.log("This is where we'll navigate home");
+                navigateHome();
+              }
+
 
             } catch(err) {
-              console.log("ERROR!!!", err);
+              console.error(err);
+              addToast({
+                status: "error",
+                message: "Something went wrong"
+              })
             }
           }}
         >
