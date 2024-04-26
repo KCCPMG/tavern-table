@@ -2,7 +2,6 @@ import "@/styles/global.css";
 import Navbar from "components/Navbar";
 import AuthProvider from "context/AuthProvider";
 import { getServerSession } from "next-auth/next";
-import User from "types/User";
 import { authOptions } from "./api/auth/[...nextauth]/route";
 import { ToasterContextProvider } from "context/ToasterContext";
 import Toaster from "components/Toast";
@@ -24,7 +23,7 @@ export default async function RootLayout({ children }: PropsType) {
       <ToasterContextProvider>
         <AuthProvider>
           <body className="h-screen">
-            <Navbar user={session?.user}/>
+            <Navbar/>
             <Toaster />
             <h1 className="text-3xl font-bold underline">text-3xl font-bold underline</h1>
             {children}

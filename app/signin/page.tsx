@@ -8,6 +8,7 @@ import Toaster from "@/components/Toast";
 import { useToasterContext, ToasterContext, ToasterContextType } from "context/ToasterContext";
 import { redirect } from "next/dist/server/api-utils";
 import { navigateHome } from "app/actions";
+import { useRouter } from "next/navigation";
 
 
 export default function SignIn() {
@@ -16,83 +17,86 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
 
   const { addToast, toasts } = useToasterContext();
+  const router = useRouter();
 
 
   // example:
+  // const [addedToastOne, setAddedToastOne] = useState(false);
+  // const [addedToastTwo, setAddedToastTwo] = useState(false);
+  // const [addedToastThree, setAddedToastThree] = useState(false);
+  // useEffect(() => {
+  //   console.log("toasts useEffect:", toasts);
+  //   if (!addedToastOne) {
+  //     addToast({
+  //       message: "toast 1",
+  //       status: "success"
+  //     });
+  //     setAddedToastOne(true);
+  //   }
+  //   else if (!addedToastTwo) {
+  //     addToast({
+  //       message: "toast 2",
+  //       status: "success"
+  //     });
+  //     setAddedToastTwo(true);
+  //   }
+  //   else if (!addedToastThree) {
+  //     addToast({
+  //       message: "toast 3",
+  //       status: "success"
+  //     })
+  //     setAddedToastThree(true);
+  //   }
+  // }, [toasts]);
 
-  const [addedToastOne, setAddedToastOne] = useState(false);
-  const [addedToastTwo, setAddedToastTwo] = useState(false);
-  const [addedToastThree, setAddedToastThree] = useState(false);
+  const attemptLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const response = await signIn("credentials", {
+        redirect: false,
+        username,
+        password
+      }) 
+      console.log(response)
+      if (!response) {
+        throw new Error("Something went wrong");
+      }
+      // else, assured response is of type SignInResponse
+      if (response.error) {
+        console.log("response.error");
+        addToast({
+          status: "error",
+          message: response.error || "Something went wrong"
+        })
+      }
+      else if (response.status === 200 && response.ok) {
+        console.log("success");
+        addToast({
+          status: "success",
+          message: "Logged In!"
+        })
+        try {
+          router.push("/");
+        } catch(err) {
+          console.error(err);
+        }
+        console.log("This should have redirected");
+      }
 
-  useEffect(() => {
-    console.log("toasts useEffect:", toasts);
-    if (!addedToastOne) {
+    } catch(err) {
+      console.error(err);
       addToast({
-        message: "toast 1",
-        status: "success"
-      });
-      setAddedToastOne(true);
-    }
-    else if (!addedToastTwo) {
-      addToast({
-        message: "toast 2",
-        status: "success"
-      });
-      setAddedToastTwo(true);
-    }
-    else if (!addedToastThree) {
-      addToast({
-        message: "toast 3",
-        status: "success"
+        status: "error",
+        message: "Something went wrong"
       })
-      setAddedToastThree(true);
     }
-  }, [toasts]);
+  }
 
   return (
     <>
       <div className="container m-auto translate-y-2/4 border-2 p-4 max-w-96">
-        {/* <Toaster /> */}
         <form 
-          onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
-            e.preventDefault();
-            try {
-              const response = await signIn("credentials", {
-                redirect: false,
-                username,
-                password
-              }) 
-              console.log(response)
-              if (!response) {
-                throw new Error("Something went wrong");
-              }
-              // else, assured response is of type SignInResponse
-              if (response.error) {
-                console.log("response.error");
-                addToast({
-                  status: "error",
-                  message: response.error || "Something went wrong"
-                })
-              }
-              else if (response.status === 200 && response.ok) {
-                console.log("success");
-                addToast({
-                  status: "success",
-                  message: "Logged In!"
-                })
-                console.log("This is where we'll navigate home");
-                navigateHome();
-              }
-
-
-            } catch(err) {
-              console.error(err);
-              addToast({
-                status: "error",
-                message: "Something went wrong"
-              })
-            }
-          }}
+          onSubmit={attemptLogin}
         >
           <FormField
             labelText="Username"
