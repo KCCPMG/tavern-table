@@ -1,14 +1,20 @@
 "use client"
 
+import FormField from "@/components/FormField";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import FormField from "@/components/FormField";
+import { useToasterContext } from "context/ToasterContext";
+import { useRouter } from "next/navigation";
 
 export default function Register() {
+
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const { addToast } = useToasterContext();
+  const router = useRouter();
 
   // async function submitRegistration(): Promise<void> {
   //   console.log("body should be...", JSON.stringify({email, username, password}));
@@ -23,23 +29,69 @@ export default function Register() {
   //   console.log(json);
   // }
 
+  const attemptRegister = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault();
+    try {
+      const response = await signIn("credentials", {
+        register: true,
+        redirect: false,
+        username,
+        email,
+        password
+      });
+      console.log(response);
+      if (!response) {
+        throw new Error("Something went wrong");
+      }
+      // else, assured response is of type SignInResponse
+      if (response.error) {
+        console.error(response.error);
+        addToast({
+          status: "error",
+          message: response.error || "Something went wrong"
+        })
+      }
+      else if (response.status === 200 && response.ok) {
+        console.log("success");
+        addToast({
+          status: "success",
+          message: `Welcome to Tavern Table, ${username}!`
+        })
+        try {
+          router.push("/");
+        } catch(err) {
+          console.error(err);
+        }
+      }
+
+    } catch(err) {
+      console.error(err);
+      addToast({
+        status: "error",
+        message: "Something went wrong"
+      })
+    }
+  }
+
   return (
     <div className="container m-auto translate-y-2/4 border-2 p-4 max-w-96">
       <form 
         // method="post" 
         // action="/api/auth/callback/credentials"
         // className="block px-auto"
-        onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-          e.preventDefault();
-          // submitRegistration();
-          signIn("credentials", {
-            register: true,
-            username,
-            email,
-            password
-          })
 
-        }}
+        // onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+        //   e.preventDefault();
+        //   // submitRegistration();
+        //   signIn("credentials", {
+        //     register: true,
+        //     username,
+        //     email,
+        //     password
+        //   })
+        // }}
+
+        onSubmit={attemptRegister}
       >
         <FormField
           labelText="E-mail" 

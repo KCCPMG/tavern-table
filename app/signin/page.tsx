@@ -12,9 +12,8 @@ export default function SignIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const { addToast, toasts } = useToasterContext();
+  const { addToast } = useToasterContext();
   const router = useRouter();
-
 
   // example:
   // const [addedToastOne, setAddedToastOne] = useState(false);
@@ -45,7 +44,7 @@ export default function SignIn() {
   //   }
   // }, [toasts]);
 
-  const attemptLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const attemptLogin = async (e: React.FormEvent<HTMLFormElement>) : Promise<void> => {
     e.preventDefault();
     try {
       const response = await signIn("credentials", {
@@ -59,7 +58,7 @@ export default function SignIn() {
       }
       // else, assured response is of type SignInResponse
       if (response.error) {
-        console.log("response.error");
+        console.error(response.error);
         addToast({
           status: "error",
           message: response.error || "Something went wrong"
@@ -69,14 +68,13 @@ export default function SignIn() {
         console.log("success");
         addToast({
           status: "success",
-          message: "Logged In!"
+          message: "Welcome back!"
         })
         try {
           router.push("/");
         } catch(err) {
           console.error(err);
         }
-        console.log("This should have redirected");
       }
 
     } catch(err) {
