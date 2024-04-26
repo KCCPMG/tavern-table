@@ -2,12 +2,8 @@
 
 import FormField from "@/components/FormField";
 import { signIn } from "next-auth/react";
-import { useState, useEffect, useContext } from "react";
-import { UserNotFoundErr, InvalidPasswordErr } from "@/lib/NextError";
-import Toaster from "@/components/Toast";
-import { useToasterContext, ToasterContext, ToasterContextType } from "context/ToasterContext";
-import { redirect } from "next/dist/server/api-utils";
-import { navigateHome } from "app/actions";
+import { useState } from "react";
+import { useToasterContext } from "context/ToasterContext";
 import { useRouter } from "next/navigation";
 
 
