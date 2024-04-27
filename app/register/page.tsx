@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import FormField from "@/components/FormField";
 import { signIn } from "next-auth/react";
@@ -15,19 +15,6 @@ export default function Register() {
 
   const { addToast } = useToasterContext();
   const router = useRouter();
-
-  // async function submitRegistration(): Promise<void> {
-  //   console.log("body should be...", JSON.stringify({email, username, password}));
-  //   const response = await fetch('/api/register', {
-  //     headers: {
-  //       contentType: "application/json"
-  //     },
-  //     method: 'POST',
-  //     body: JSON.stringify({email, username, password}),
-  //   })
-  //   const json = await response.json();
-  //   console.log(json);
-  // }
 
   const attemptRegister = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -75,24 +62,7 @@ export default function Register() {
 
   return (
     <div className="container m-auto translate-y-2/4 border-2 p-4 max-w-96">
-      <form 
-        // method="post" 
-        // action="/api/auth/callback/credentials"
-        // className="block px-auto"
-
-        // onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-        //   e.preventDefault();
-        //   // submitRegistration();
-        //   signIn("credentials", {
-        //     register: true,
-        //     username,
-        //     email,
-        //     password
-        //   })
-        // }}
-
-        onSubmit={attemptRegister}
-      >
+      <form onSubmit={attemptRegister}>
         <FormField
           labelText="E-mail" 
           inputType="text" 

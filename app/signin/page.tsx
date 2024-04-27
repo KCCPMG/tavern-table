@@ -15,35 +15,6 @@ export default function SignIn() {
   const { addToast } = useToasterContext();
   const router = useRouter();
 
-  // example:
-  // const [addedToastOne, setAddedToastOne] = useState(false);
-  // const [addedToastTwo, setAddedToastTwo] = useState(false);
-  // const [addedToastThree, setAddedToastThree] = useState(false);
-  // useEffect(() => {
-  //   console.log("toasts useEffect:", toasts);
-  //   if (!addedToastOne) {
-  //     addToast({
-  //       message: "toast 1",
-  //       status: "success"
-  //     });
-  //     setAddedToastOne(true);
-  //   }
-  //   else if (!addedToastTwo) {
-  //     addToast({
-  //       message: "toast 2",
-  //       status: "success"
-  //     });
-  //     setAddedToastTwo(true);
-  //   }
-  //   else if (!addedToastThree) {
-  //     addToast({
-  //       message: "toast 3",
-  //       status: "success"
-  //     })
-  //     setAddedToastThree(true);
-  //   }
-  // }, [toasts]);
-
   const attemptLogin = async (e: React.FormEvent<HTMLFormElement>) : Promise<void> => {
     e.preventDefault();
     try {
@@ -112,11 +83,3 @@ export default function SignIn() {
     </>
   )
 }
-
-// export async function getServerSideProps(context: GetServerSidePropsContext) {
-//   return {
-//     props: {
-//       csrfToken: await getCsrfToken(context),
-//     },
-//   }
-// }
