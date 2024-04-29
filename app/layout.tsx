@@ -25,7 +25,6 @@ export default async function RootLayout({ children }: PropsType) {
           <body className="h-screen">
             <Navbar/>
             <Toaster />
-            <h1 className="text-3xl font-bold underline">text-3xl font-bold underline</h1>
             {children}
           </body>
         </AuthProvider>
