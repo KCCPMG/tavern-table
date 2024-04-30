@@ -19,7 +19,7 @@ if (!cached) {
 
 async function mongooseConnect() {
   if (cached.conn) {
-    console.log("mongooseConnect", cached.conn.now())
+    // console.log("mongooseConnect", cached.conn.now())
     return cached.conn;
   }
   if (!cached.promise) {
@@ -34,7 +34,7 @@ async function mongooseConnect() {
     throw e;
   }
 
-  console.log("mongooseConnect", cached.conn.now())
+  // console.log("mongooseConnect", cached.conn.now())
   return cached.conn;
 }
 

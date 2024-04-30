@@ -43,10 +43,10 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials, request): Promise<any> {
 
         try {
-          console.log("\ntest from CredentialsProvider authorize");
+          // console.log("\ntest from CredentialsProvider authorize");
           // const user = { id: "1", username: "J Smith", email: "jsmith@example.com", testProperty: "test" }
   
-          console.log({credentials});
+          // console.log({credentials});
 
           await mongooseConnect();
 
@@ -57,12 +57,12 @@ export const authOptions: NextAuthOptions = {
               password: credentials.password 
             })
 
-            return true;
+            return user;
             
           } else {
             const user = await User.authenticate(credentials!.username, credentials!.password);
             
-            console.log("authorize: ", {user});
+            // console.log("authorize: ", {user});
             return user;
 
           }

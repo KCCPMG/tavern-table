@@ -12,7 +12,6 @@ type PropsType = {
 
 export default async function RootLayout({ children }: PropsType) {
 
-  const session = await getServerSession(authOptions);
   // console.log("Layout Session:", {session});
   // console.log("Layout:", session?.user);
 
