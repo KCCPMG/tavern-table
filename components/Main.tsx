@@ -3,7 +3,7 @@ import MainLoggedIn from "./MainLoggedIn";
 import MainLoggedOut from "./MainLoggedOut";
 import { useSession } from "next-auth/react"
 
-export default async function Main() {
+export default function Main() {
   
   const { data: session, status } = useSession()
   
