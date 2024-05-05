@@ -46,7 +46,7 @@ export default function Navbar() {
   // console.log("Navbar:", user ? user : "no user");
 
   return (
-    <nav className="bg-black w-full p-2">
+    <nav className="bg-black w-full p-2 flex flex-initial">
       <span className="text-white text-2xl">Navbar</span>
       {session?.user ? <LoggedInPanel username={session.user.username!} /> : <LoggedOutPanel />}
     </nav>
