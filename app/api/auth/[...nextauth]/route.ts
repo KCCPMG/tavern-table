@@ -62,7 +62,7 @@ export const authOptions: NextAuthOptions = {
           } else {
             const user = await User.authenticate(credentials!.username, credentials!.password);
             
-            // console.log("authorize: ", {user});
+            console.log("authorize: ", {user});
             return user;
 
           }
@@ -109,27 +109,34 @@ export const authOptions: NextAuthOptions = {
       else if (new URL(url).origin === baseUrl) return url
       return baseUrl;
     },
-    async jwt( {user, token, session} ) {
-      // console.log("\n\njwt callback:", { user, token, session });
+    async jwt( props ) {
+      console.log("\n\njwt callback:", {props})
+      const {user, token, session} = props;
+      console.log("\n\njwt callback:", { user, token, session });
       if (user) {
         return {
           ...token,
-          username: user.username,
-          testProperty: user.testProperty
+          ...user,
+          // username: user.username,
+          // testProperty: user.testProperty
         }
       }
       return token;
     },
     async session( {session, token, user} ) {
-      // console.log("session callback:", { user, token, session } );
-      return {
+      console.log("session callback:", { user, token, session } );
+      const toReturn = {
         ...session,
         user: {
           ...session.user,
-          testProperty: token.testProperty,
-          username: token.username
+          // testProperty: token.testProperty,
+          username: token.username,
+          _id: token._doc._id,
+          id: token._doc._id
         }
       }
+      console.log({toReturn});
+      return toReturn;
     }
   },
 }
