@@ -6,6 +6,7 @@ import { authOptions } from "./api/auth/[...nextauth]/route";
 import { ToasterContextProvider } from "context/ToasterContext";
 import { ModalContextProvider } from "context/ModalContext";
 import Toaster from "components/Toast";
+import Modal from "components/Modal";
 import MainContainer from "components/MainContainer";
 
 type PropsType = {
@@ -27,6 +28,7 @@ export default async function RootLayout({ children }: PropsType) {
             <body className="h-screen flex flex-col">
               <Navbar/>
               <Toaster />
+              <Modal />
               <MainContainer>
                 {children}
               </MainContainer>

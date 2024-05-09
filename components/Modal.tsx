@@ -1,24 +1,24 @@
 "use client";
+import { useModalContext } from "context/ModalContext";
 import { MouseEvent } from "react"
 
 
-type ModalProps = {
-  display: boolean,
-  classNameProp? : string,
-  closeModal : (e: MouseEvent) => void,
-}
 
-export default function Modal({ display, classNameProp, closeModal }: ModalProps) {
-  if (display) return (
+
+export default function Modal() {
+
+  const { showModal, setShowModal } = useModalContext();
+
+  if (showModal) return (
     <>
       {/* Background */}
       <div 
         className="z-10 absolute h-full w-full opacity-20 bg-gray-600"
-        onClick={closeModal}
+        onClick={() => setShowModal(false)}
       >
       </div>
       {/* Modal */}
-      <div className={`${classNameProp} absolute z-20 margin-auto`}>
+      <div className={`absolute z-20 margin-auto`}>
 
       </div>
     </>
