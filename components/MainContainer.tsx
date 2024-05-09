@@ -7,7 +7,7 @@ type MainContainerProps = {
 export default async function MainContainer({children}: MainContainerProps) {
   return (
     <div className="main-container p-8 border flex flex-auto" >
-      <div className="flex flex-auto border">
+      <div className="flex-auto border">
         {children}
       </div>
     </div>

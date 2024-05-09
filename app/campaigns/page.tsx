@@ -1,13 +1,14 @@
 import { getServerSession } from "next-auth";
+import { getSession } from "next-auth/react";
 import { authOptions } from "@/api/auth/[...nextauth]/route";
 import { redirect } from 'next/navigation';
+import AddCampaignButton from "@/components/AddCampaignButton";
 
 export default async function Campaigns() {
 
-  const session = await getServerSession(authOptions);
-  console.log("From campaigns page:", {session});
+  const serverSession = await getServerSession(authOptions);
 
-  if (!session?.user) {
+  if (!serverSession?.user) {
     redirect("/");
   }
 
@@ -16,8 +17,13 @@ export default async function Campaigns() {
   return (
     <>
       Campaigns go here.
-      <p>Session: {JSON.stringify(session)}</p>
-      <p>Username: {session.user.username}</p>
+      <p>Server Session: {JSON.stringify(serverSession, null, 2)}</p>
+      <p>Username: {serverSession.user.username}</p>
+      <AddCampaignButton />
+
     </>
   )
 }
+
+
+

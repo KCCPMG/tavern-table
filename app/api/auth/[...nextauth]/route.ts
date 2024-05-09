@@ -110,29 +110,37 @@ export const authOptions: NextAuthOptions = {
       return baseUrl;
     },
     async jwt( props ) {
-      console.log("\n\njwt callback:", {props})
+      console.log("\n\njwt callback:", {...props})
       const {user, token, session} = props;
-      console.log("\n\njwt callback:", { user, token, session });
+      // console.log("\n\njwt callback:", { user, token, session });
       if (user) {
         return {
           ...token,
-          ...user,
+          // ...user,
           // username: user.username,
           // testProperty: user.testProperty
+          user
         }
       }
       return token;
     },
-    async session( {session, token, user} ) {
-      console.log("session callback:", { user, token, session } );
+    async session( props ) {
+      console.log("\n\nsession callback:", {...props})
+      // it seems as though there will never be a user in the props, needs to be extracted from session
+      const {session, token} = props;
+      // console.log("\n\nnsession callback:", { user, token, session } );
+
+      const user = token.user || {};
+
       const toReturn = {
         ...session,
         user: {
-          ...session.user,
+          // ...session.user,
           // testProperty: token.testProperty,
-          username: token.username,
-          _id: token._doc._id,
-          id: token._doc._id
+          // username: token.username,
+          // _id: token._doc._id,
+          // id: token._doc._id
+          ...user
         }
       }
       console.log({toReturn});
