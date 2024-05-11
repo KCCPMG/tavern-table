@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
 import Modal from "components/Modal"
-import { useModalContext } from "context/ModalContext";
+import { ModalBody, useModalContext } from "context/ModalContext";
 
 
 export default function AddCampaignButton() {
 
-  const { showModal, setShowModal } = useModalContext();
+  const { showModal, setShowModal, setModalBody } = useModalContext();
   const [displayModal, setDisplayModal] = useState(false); 
 
   return (
@@ -14,6 +14,7 @@ export default function AddCampaignButton() {
       <button onClick={() => { 
         console.log(displayModal);
         setShowModal(true); 
+        setModalBody(ModalBody())
       }}>
         Add Campaign
       </button>
@@ -24,3 +25,12 @@ export default function AddCampaignButton() {
     </>
   )
 }
+
+/**
+ * A Modal will have.....
+ * FormFields
+ * State for each FormField
+ * Text
+ * Title?
+ * Form Action
+ */

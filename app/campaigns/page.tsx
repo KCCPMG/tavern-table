@@ -3,6 +3,8 @@ import { getSession } from "next-auth/react";
 import { authOptions } from "@/api/auth/[...nextauth]/route";
 import { redirect } from 'next/navigation';
 import AddCampaignButton from "@/components/AddCampaignButton";
+import FakeComponent from "@/components/FakeComponent";
+import FormField from "@/components/FormField";
 
 export default async function Campaigns() {
 
@@ -20,7 +22,7 @@ export default async function Campaigns() {
       <p>Server Session: {JSON.stringify(serverSession, null, 2)}</p>
       <p>Username: {serverSession.user.username}</p>
       <AddCampaignButton />
-
+      <FakeComponent />
     </>
   )
 }
