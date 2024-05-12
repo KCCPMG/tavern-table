@@ -9,6 +9,23 @@ export function AddCampaignModal() {
   return (
     <div>
       Hello
+      <p>Hello</p>
+      <p>Hello</p>
+      <p>Hello</p>
+      <p>Hello</p>
+      <p>Hello</p>
+      <p>Hello</p>
+      <p>Hello</p>
+      <p>Hello</p>
+      <p>Hello</p>
+      <p>Hello</p>
+      <p>Hello</p>
+      <p>Hello</p>
+      <p>Hello</p>
+      <p>Hello</p>
+      <p>Hello</p>
+      <p>Hello</p>
+      <p>Hello</p>
     </div>
   )
 }
@@ -27,10 +44,6 @@ export default function AddCampaignButton() {
       }}>
         Add Campaign
       </button>
-      {/* <Modal 
-        display={displayModal}
-        closeModal={() => setDisplayModal(false)} 
-      /> */}
     </>
   )
 }
