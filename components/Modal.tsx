@@ -7,7 +7,7 @@ import { MouseEvent } from "react"
 
 export default function Modal() {
 
-  const { showModal, setShowModal } = useModalContext();
+  const { showModal, setShowModal, modalBody } = useModalContext();
 
   if (showModal) return (
     <>
@@ -18,8 +18,8 @@ export default function Modal() {
       >
       </div>
       {/* Modal */}
-      <div className={`absolute z-20 margin-auto`}>
-
+      <div className={`absolute z-20 mx-auto h-40 w-40 bg-white`}>
+        {modalBody}
       </div>
     </>
   );
