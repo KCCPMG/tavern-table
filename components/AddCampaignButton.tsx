@@ -2,30 +2,40 @@
 import { useState } from "react";
 import Modal from "components/Modal"
 import { useModalContext } from "context/ModalContext";
+import FormField from "./FormField";
 
 
 export function AddCampaignModal() {
 
+  const [campaignName, setCampaignName] = useState("");
+  const [game, setGame] = useState("");
+
   return (
     <div>
-      Hello
-      <p>Hello</p>
-      <p>Hello</p>
-      <p>Hello</p>
-      <p>Hello</p>
-      <p>Hello</p>
-      <p>Hello</p>
-      <p>Hello</p>
-      <p>Hello</p>
-      <p>Hello</p>
-      <p>Hello</p>
-      <p>Hello</p>
-      <p>Hello</p>
-      <p>Hello</p>
-      <p>Hello</p>
-      <p>Hello</p>
-      <p>Hello</p>
-      <p>Hello</p>
+      <h2>Create New Campaign</h2>
+      <hr />
+      <form>
+        <label className="block">
+          Campaign Name:
+          <input 
+            type="text" required 
+            className="block"
+            value={campaignName}
+            onChange={(e) => setCampaignName(e.target.value)} 
+          />
+        </label>
+        <label className="block">
+          Game:
+          <input 
+            className="block"
+            type="text" required
+            value={game}
+            onChange={(e) => setGame(e.target.value)}
+          />
+        </label>
+        <button type="submit">Create Campaign!</button>
+      </form>
+
     </div>
   )
 }
