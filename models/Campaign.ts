@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import Thread from "./Thread";
+import { THREAD_CHAT_TYPES } from "./constants";
 
 export interface ICampaign {
   _id: mongoose.Types.ObjectId,
@@ -21,7 +23,7 @@ export type RequiredCampaignValues = {
   createdBy?: mongoose.Types.ObjectId
 }
 
-const Campaign = new mongoose.Schema({
+const CampaignSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true
@@ -70,6 +72,41 @@ const Campaign = new mongoose.Schema({
   }
 })
 
+type CreateCampaignProps = {
+  creatorId: mongoose.Types.ObjectId,
+  name: string,
+  description?: string,
+  game?: string,
+  invitedPlayers?: Array<mongoose.Types.ObjectId>
+}
 
-export default mongoose.models.Campaign || mongoose.model('Campaign', Campaign);
+export interface CampaignModel extends mongoose.Model<ICampaign> {
+  createCampaign(newCampaignDetails: RequiredCampaignValues): Promise<ICampaign>,
+}
+
+CampaignSchema.static('createCampaign', async function createCampaign(createObj : CreateCampaignProps) : Promise<ICampaign> {
+  try {
+    const { creatorId, name } = createObj;
+    const thread = await Thread.create({
+      name,
+      chatType: THREAD_CHAT_TYPES.CAMPAIGN
+    })
+    const campaign = await this.create({
+      name,
+      createdBy: creatorId,
+      description: createObj.description || null,
+      dm: [creatorId],
+      game: createObj.game || null, 
+      invitedPlayers: createObj.invitedPlayers || null, 
+      threadId: thread._id
+    });
+    return campaign;
+
+  } catch(err) {
+    throw(err);
+  }
+
+}) 
+
+export default mongoose.models.Campaign as CampaignModel || mongoose.model<ICampaign, CampaignModel>('Campaign', CampaignSchema);
 
