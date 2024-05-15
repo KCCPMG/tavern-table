@@ -81,7 +81,7 @@ type CreateCampaignProps = {
 }
 
 export interface CampaignModel extends mongoose.Model<ICampaign> {
-  createCampaign(newCampaignDetails: RequiredCampaignValues): Promise<ICampaign>,
+  createCampaign(newCampaignDetails: CreateCampaignProps): Promise<ICampaign>,
 }
 
 CampaignSchema.static('createCampaign', async function createCampaign(createObj : CreateCampaignProps) : Promise<ICampaign> {
@@ -89,7 +89,8 @@ CampaignSchema.static('createCampaign', async function createCampaign(createObj 
     const { creatorId, name } = createObj;
     const thread = await Thread.create({
       name,
-      chatType: THREAD_CHAT_TYPES.CAMPAIGN
+      chatType: THREAD_CHAT_TYPES.CAMPAIGN,
+      participants: [creatorId]
     })
     const campaign = await this.create({
       name,
@@ -97,7 +98,7 @@ CampaignSchema.static('createCampaign', async function createCampaign(createObj 
       description: createObj.description || null,
       dm: [creatorId],
       game: createObj.game || null, 
-      invitedPlayers: createObj.invitedPlayers || null, 
+      invitedPlayers: createObj.invitedPlayers || [], 
       threadId: thread._id
     });
     return campaign;

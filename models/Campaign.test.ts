@@ -1,7 +1,7 @@
 import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
 import User, { IUser } from "./User";
-import Thread from "./Thread";
+import Thread, { IThread } from "./Thread";
 import Campaign, { ICampaign } from "./Campaign";
 import { THREAD_CHAT_TYPES } from "./constants";
 import { sampleUser1Details, sampleCampaignDetails } from "./test_resources/sampleDocs";
@@ -41,8 +41,9 @@ describe("A campaign", function() {
 
   test("can be created", async function() {
 
-    // make returned UserType obj indexable by string
-    const newCampaign: {[index: string]: ICampaign} = await Campaign.create(sampleCampaignDetails);
+    // make returned Campaign obj indexable by string
+    const newCampaign: {[index: string]: any} = await Campaign.create(sampleCampaignDetails);
+
     
     for (let [key, val] of Object.entries(sampleCampaignDetails)) {
       expect(newCampaign).toHaveProperty(key);
@@ -73,5 +74,41 @@ describe("A campaign", function() {
     expect(foundCampaigns.length).toBe(0);
   })
 
+
+  test("can be created with the static createCampaign method", async function() {
+
+    // create user, check correct initializiation
+    const sampleUser = await User.findOne({email: sampleUser1Details.email}) as IUser;
+    expect(sampleUser).not.toBe(null);
+
+    // create campaign
+    const newCampaign: {[index: string]: any} = await Campaign.createCampaign({
+      creatorId: sampleUser._id,
+      name: sampleCampaignDetails.name
+    });
+
+    expect(newCampaign.name).toBe(sampleCampaignDetails.name);
+    expect(newCampaign.createdBy).toBe(sampleUser._id);
+    expect(newCampaign.description).toBe(null);
+    expect(newCampaign.dm).toEqual([sampleUser._id]);
+    expect(newCampaign.game).toBe(null);
+    expect(newCampaign.invitedPlayers).toEqual([]);
+    
+    // check thread
+    const campaignThread: IThread = await Thread.findOne({_id: newCampaign.threadId}) as IThread;
+    expect(campaignThread.participants).toEqual([sampleUser._id])
+    expect(campaignThread.chatType).toBe(THREAD_CHAT_TYPES.CAMPAIGN)
+    expect(campaignThread.participants)
+
+    // delete campaign, check deletion
+    await Campaign.deleteMany({_id: newCampaign._id});
+    const checkDeleted = await Campaign.find({_id: newCampaign._id});
+    expect(checkDeleted.length).toBe(0);
+
+    // delete thread, check deletion
+    await Thread.deleteMany({_id: campaignThread._id});
+    const checkDeletedThread = await Thread.find({_id: campaignThread._id});
+    expect(checkDeletedThread.length).toBe(0);
+  })
 
 })
