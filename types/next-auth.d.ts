@@ -1,6 +1,7 @@
 // import NextAuth from "next-auth";
 import { Session } from "next-auth";
 import User from "./User";
+import mongoose from "mongoose";
 
 
 // rename User for use inside "next-auth" module
@@ -16,10 +17,13 @@ declare module "next-auth" {
 
     user: {
       username?: string,
-      id?: number,
-      email?: string
+      _id?: string,
+      email?: string,
+      characters: Array<mongoose.Types.ObjectId>,
+      campaigns: Array<mongoose.Types.ObjectId>,
+      friends: Array<mongoose.Types.ObjectId>,
     }
-    
+  
   }
 
   // User from "types/User"

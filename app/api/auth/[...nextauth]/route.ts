@@ -62,7 +62,7 @@ export const authOptions: NextAuthOptions = {
           } else {
             const user = await User.authenticate(credentials!.username, credentials!.password);
             
-            console.log("authorize: ", {user});
+            // console.log("authorize: ", {user});
             return user;
 
           }
@@ -89,8 +89,8 @@ export const authOptions: NextAuthOptions = {
           // all errors should be NextErrors, if not, send server error
           else return Response.error()
            */
-          console.log("authorize: no user");
-          console.log(e);
+          // console.log("authorize: no user");
+          // console.log(e);
           throw(e);
         }
       },
@@ -110,7 +110,7 @@ export const authOptions: NextAuthOptions = {
       return baseUrl;
     },
     async jwt( props ) {
-      console.log("\n\njwt callback:", {...props})
+      // console.log("\n\njwt callback:", {...props})
       const {user, token, session} = props;
       // console.log("\n\njwt callback:", { user, token, session });
       if (user) {
@@ -125,7 +125,7 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session( props ) {
-      console.log("\n\nsession callback:", {...props})
+      // console.log("\n\nsession callback:", {...props})
       // it seems as though there will never be a user in the props, needs to be extracted from session
       const {session, token} = props;
       // console.log("\n\nnsession callback:", { user, token, session } );
