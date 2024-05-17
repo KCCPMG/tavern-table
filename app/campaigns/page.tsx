@@ -7,11 +7,26 @@ import { ICampaign } from "@/models/Campaign";
 import User, { IUser } from "@/models/User";
 import mongoose from "mongoose";
 import { UserNotFoundErr } from "@/lib/NextError";
+import { revalidatePath } from "next/cache";
+
+
+
+/**
+ * I need to be able to get data again
+ * In a server componnent, I cannot add *any* functionality to
+ * for example, a button, without the compiler yelling at me and
+ * the page breaking
+ */
+
 
 
 // export function getCampaigns(userId): Array<ICampaign> {
 //   Campaign.find()
 // }
+
+function getTime() {
+  return new Date();
+}
 
 
 async function getUser(userId: mongoose.Types.ObjectId | string): Promise<IUser> {
@@ -25,6 +40,8 @@ async function getUser(userId: mongoose.Types.ObjectId | string): Promise<IUser>
 }
 
 export default async function Campaigns() {
+
+  const time = getTime();
 
   const serverSession = await getServerSession(authOptions);
   const user = serverSession?.user._id ? 
@@ -43,10 +60,12 @@ export default async function Campaigns() {
     <>
       {/* <p>Server Session: {JSON.stringify(serverSession, null, 2)}</p>
       <p>Username: {serverSession.user.username}</p> */}
-      <p><AddCampaignButton /></p>
+      <p><AddCampaignButton  /></p>
       <p>Campaigns go here.</p>
       {/* {campaigns.map(c) => <Link>{campaigns.name}</Link>} */}
       <p>User: {JSON.stringify(user, null, 2)};</p>
+      <p>{time.toString()}</p>
+      <p><button onClick={() => revalidatePath("campaigns/page")}>Refresh</button></p>
     </>
   )
 }
