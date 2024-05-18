@@ -8,6 +8,8 @@ import User, { IUser } from "@/models/User";
 import mongoose from "mongoose";
 import { UserNotFoundErr } from "@/lib/NextError";
 import { revalidatePath } from "next/cache";
+import { GET } from "@/api/campaigns/route";
+import { NextRequest, NextResponse } from "next/server";
 
 
 
@@ -43,7 +45,7 @@ async function getUser(userId: mongoose.Types.ObjectId | string): Promise<IUser>
   }
 }
 
-export default async function Campaigns() {
+export default async function Campaigns(req: NextRequest, res: NextResponse) {
 
   const time = getTime();
 
@@ -54,11 +56,12 @@ export default async function Campaigns() {
   console.log({retrievedUser: user})
   // const campaigns = getCampaigns(serverSession?.user?._id);
 
-  if (!serverSession?.user) {
-    redirect("/");
-  }
+  // if (!serverSession?.user) {
+  //   redirect("/");
+  // }
 
-  const skippyReq = await fetch(`${process.env.NEXTAUTH_URL}/api/campaigns`);
+  // const skippyReq = await fetch(`${process.env.NEXTAUTH_URL}/api/campaigns`);
+  const skippyReq = await GET(req, res);
   const skippy = await skippyReq.json();
 
   // else

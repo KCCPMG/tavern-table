@@ -143,7 +143,7 @@ export const authOptions: NextAuthOptions = {
           ...user
         }
       }
-      console.log({toReturn});
+      // console.log({toReturn});
       return toReturn;
     }
   },
