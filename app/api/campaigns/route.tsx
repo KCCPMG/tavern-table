@@ -23,7 +23,24 @@ export async function GET(req: NextRequest, res: NextResponse) {
 }
 
 // create new campaign
-export async function POST() {
+export async function POST(req: NextRequest, res: NextResponse) {
+  try {
 
+    console.log({req})
+
+    // const createObj = req?.body?.createObj
+    // const campaign = await Campaign.createCampaign({
+    //   creatorId: mongoose.Types.ObjectId,
+    //   name: string,
+    //   description?: string,
+    //   game?: string,
+    //   invitedPlayers?: Array<mongoose.Types.ObjectId>
+    // })
+
+    return Response.json("successful post");
+
+  } catch(err) {
+    return Response.error();
+  }
 }
 

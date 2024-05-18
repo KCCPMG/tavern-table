@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { ReactEventHandler, useState } from "react";
 import Modal from "components/Modal"
 import { useModalContext } from "context/ModalContext";
+import { FormEvent } from "react";
 import FormField from "./FormField";
 
 
@@ -10,11 +11,28 @@ export function AddCampaignModal() {
   const [campaignName, setCampaignName] = useState("");
   const [game, setGame] = useState("");
 
+  async function submitForm(e: FormEvent): Promise<void> {
+    e.preventDefault();
+    console.log("ya clicked me");
+    const req = await fetch('/api/campaigns', {
+      method: "POST",
+      body: JSON.stringify({
+        createObj: {
+          game,
+          name: campaignName
+        }
+      })
+    })
+    const json = await req.json();
+    console.log(json);
+
+  }
+
   return (
     <div>
       <h2>Create New Campaign</h2>
       <hr />
-      <form>
+      <form onSubmit={submitForm}>
         <label className="block">
           Campaign Name:
           <input 
