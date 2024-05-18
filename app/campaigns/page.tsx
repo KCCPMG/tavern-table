@@ -16,6 +16,10 @@ import { revalidatePath } from "next/cache";
  * In a server componnent, I cannot add *any* functionality to
  * for example, a button, without the compiler yelling at me and
  * the page breaking
+ * Even looking at swr, it seems as though there may not be any choice 
+ * except to move everything to client components.
+ * Likely the best I can hope to do is use the server side to retrieve
+ * the initial data on the page load as props to pass to the client components
  */
 
 
@@ -54,6 +58,9 @@ export default async function Campaigns() {
     redirect("/");
   }
 
+  const skippyReq = await fetch(`${process.env.NEXTAUTH_URL}/api/campaigns`);
+  const skippy = await skippyReq.json();
+
   // else
 
   return (
@@ -65,7 +72,8 @@ export default async function Campaigns() {
       {/* {campaigns.map(c) => <Link>{campaigns.name}</Link>} */}
       <p>User: {JSON.stringify(user, null, 2)};</p>
       <p>{time.toString()}</p>
-      <p><button onClick={() => revalidatePath("campaigns/page")}>Refresh</button></p>
+      {/* <p><button onClick={() => revalidatePath("campaigns/page")}>Refresh</button></p> */}
+      <p>{skippy}</p>
     </>
   )
 }
