@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { getSession } from "next-auth/react";
 import { authOptions } from "@/api/auth/[...nextauth]/route";
 import { redirect } from 'next/navigation';
-import AddCampaignButton from "@/components/AddCampaignButton";
+import Campaigns from "@/components/Campaigns";
 import { ICampaign } from "@/models/Campaign"; 
 import User, { IUser } from "@/models/User";
 import mongoose from "mongoose";
@@ -45,24 +45,25 @@ async function getUser(userId: mongoose.Types.ObjectId | string): Promise<IUser>
   }
 }
 
-export default async function Campaigns(req: NextRequest, res: NextResponse) {
+export default async function Page(req: NextRequest, res: NextResponse) {
 
   const time = getTime();
 
   const serverSession = await getServerSession(authOptions);
-  const user = serverSession?.user._id ? 
-    await getUser(serverSession?.user._id) :
-    null;
-  console.log({retrievedUser: user})
+  // const user = serverSession?.user._id ? 
+  //   await getUser(serverSession?.user._id) :
+  //   null;
+  // console.log({retrievedUser: user})
   // const campaigns = getCampaigns(serverSession?.user?._id);
 
-  // if (!serverSession?.user) {
-  //   redirect("/");
-  // }
+  if (!(serverSession?.user)) {
+    redirect("/");
+  }
 
-  // const skippyReq = await fetch(`${process.env.NEXTAUTH_URL}/api/campaigns`);
-  const skippyReq = await GET(req, res);
-  const skippy = await skippyReq.json();
+  // const initCampaignsReq = await fetch(`${process.env.NEXTAUTH_URL}/api/campaigns`);
+  const initCampaignsReq = await GET(req, res);
+  const initCampaigns = await initCampaignsReq.json();
+  
 
   // else
 
@@ -70,13 +71,13 @@ export default async function Campaigns(req: NextRequest, res: NextResponse) {
     <>
       {/* <p>Server Session: {JSON.stringify(serverSession, null, 2)}</p>
       <p>Username: {serverSession.user.username}</p> */}
-      <p><AddCampaignButton  /></p>
       <p>Campaigns go here.</p>
+      <p><Campaigns initialCampaigns={initCampaigns} /></p>
       {/* {campaigns.map(c) => <Link>{campaigns.name}</Link>} */}
-      <p>User: {JSON.stringify(user, null, 2)};</p>
+      {/* <p>User: {JSON.stringify(user, null, 2)};</p> */}
       <p>{time.toString()}</p>
       {/* <p><button onClick={() => revalidatePath("campaigns/page")}>Refresh</button></p> */}
-      <p>{skippy}</p>
+      <p>{initCampaigns}</p>
     </>
   )
 }

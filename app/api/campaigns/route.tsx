@@ -9,17 +9,31 @@ import { getToken } from "next-auth/jwt";
 
 // get all campaigns for a user
 export async function GET(req: NextRequest, res: NextResponse) {
-  const session = await getSession();
-  console.log({"session on route": session});
-  const serverSession = await getServerSession(authOptions);
-  console.log({"server session on route": serverSession});
 
-  // console.log({req});
-  // console.log({cookies: req.cookies})
-  const token = await getToken({ req });
-  console.log({token});
+  try {
+    // const session = await getSession();
+    // console.log({"session on route": session});
+    const serverSession = await getServerSession(authOptions);
+    console.log({"server session on route": serverSession});
+  
+    // console.log({req});
+    // console.log({cookies: req.cookies})
+    const token = await getToken({ req });
+    console.log({token});
 
-  return Response.json("hello skippy");
+    const campaignIds = serverSession?.user.campaigns;
+
+    const campaignPromises = campaignIds?.map(cid => {
+      return Campaign.findById(cid);
+    }) || [];
+  
+    const campaigns = await Promise.all(campaignPromises);
+
+    return Response.json(campaigns);
+
+  } catch(err) {
+    return Response.error();
+  }
 }
 
 // create new campaign

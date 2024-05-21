@@ -4,6 +4,8 @@ import Modal from "components/Modal"
 import { useModalContext } from "context/ModalContext";
 import { FormEvent } from "react";
 import FormField from "./FormField";
+import { ICampaign } from "@/models/Campaign";
+import Link from "next/link";
 
 
 export function AddCampaignModal() {
@@ -58,7 +60,7 @@ export function AddCampaignModal() {
   )
 }
 
-export default function AddCampaignButton() {
+export function AddCampaignButton() {
 
   const { showModal, setShowModal, setModalBody } = useModalContext();
   const [displayModal, setDisplayModal] = useState(false); 
@@ -74,4 +76,52 @@ export default function AddCampaignButton() {
       </button>
     </>
   )
+}
+
+
+type CampaignLinkProps = {
+  name: string,
+  id: string
+}
+
+export function CampaignLink({name, id} : CampaignLinkProps) {
+
+  return (
+    <Link href={`/${id}`}>
+      <h5>{name}</h5>
+    </Link>
+  )
+
+}
+
+
+type CampaignsProps = {
+  initialCampaigns: Array<ICampaign>
+}
+
+export default function Campaigns({initialCampaigns}: CampaignsProps) {
+
+  console.log({initialCampaigns});
+  const [campaigns, setCampaigns] = useState<Array<ICampaign>>(initialCampaigns || []);
+
+  console.log(campaigns);
+
+  return (
+    <>
+      <AddCampaignButton />
+      {
+        campaigns.map(c => {
+          const stringifiedId=c._id.toString(); 
+          return (
+            <CampaignLink
+              name={c.name} 
+              id={stringifiedId} 
+              key={stringifiedId} 
+            />
+          );
+        })
+      }
+    </>
+  )
+
 }
