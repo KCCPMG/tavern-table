@@ -6,6 +6,9 @@ import { getSession } from "next-auth/react";
 import { authOptions } from "@/api/auth/[...nextauth]/route";
 import { getToken } from "next-auth/jwt";
 
+import mongooseConnect from '@/lib/mongooseConnect';
+
+
 
 // get all campaigns for a user
 export async function GET(req: NextRequest, res: NextResponse) {
@@ -13,13 +16,14 @@ export async function GET(req: NextRequest, res: NextResponse) {
   try {
     // const session = await getSession();
     // console.log({"session on route": session});
+
     const serverSession = await getServerSession(authOptions);
-    console.log({"server session on route": serverSession});
+    // console.log({"server session on route": serverSession});
   
     // console.log({req});
     // console.log({cookies: req.cookies})
     const token = await getToken({ req });
-    console.log({token});
+    // console.log({token});
 
     const campaignIds = serverSession?.user.campaigns;
 
@@ -40,20 +44,22 @@ export async function GET(req: NextRequest, res: NextResponse) {
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
 
-    console.log({req})
+    await mongooseConnect();
 
-    // const createObj = req?.body?.createObj
-    // const campaign = await Campaign.createCampaign({
-    //   creatorId: mongoose.Types.ObjectId,
-    //   name: string,
-    //   description?: string,
-    //   game?: string,
-    //   invitedPlayers?: Array<mongoose.Types.ObjectId>
-    // })
+    const serverSession = await getServerSession(authOptions);
 
-    return Response.json("successful post");
+    const { createObj } = await req.json();
+    console.log({createObj});
+    const campaign = await Campaign.createCampaign({
+      ...createObj,
+      creatorId: serverSession?.user._id
+    });
+    console.log({campaign});
+
+    return Response.json(campaign);
 
   } catch(err) {
+    console.log(err);
     return Response.error();
   }
 }

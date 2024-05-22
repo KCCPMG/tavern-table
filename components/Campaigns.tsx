@@ -18,6 +18,9 @@ export function AddCampaignModal() {
     console.log("ya clicked me");
     const req = await fetch('/api/campaigns', {
       method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         createObj: {
           game,
