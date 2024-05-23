@@ -93,6 +93,10 @@ describe("A campaign", function() {
     expect(newCampaign.dm).toEqual([sampleUser._id]);
     expect(newCampaign.game).toBe(null);
     expect(newCampaign.invitedPlayers).toEqual([]);
+
+    // check that campaign is in user's campaigns
+    const sampleUserAfter = await User.findById(newCampaign.createdBy);
+    expect(sampleUserAfter!.campaigns).toStrictEqual([newCampaign._id]);
     
     // check thread
     const campaignThread: IThread = await Thread.findOne({_id: newCampaign.threadId}) as IThread;

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Thread from "./Thread";
+import User from "./User";
 import { THREAD_CHAT_TYPES } from "./constants";
 
 export interface ICampaign {
@@ -87,11 +88,14 @@ export interface CampaignModel extends mongoose.Model<ICampaign> {
 CampaignSchema.static('createCampaign', async function createCampaign(createObj : CreateCampaignProps) : Promise<ICampaign> {
   try {
     const { creatorId, name } = createObj;
-    const thread = await Thread.create({
-      name,
-      chatType: THREAD_CHAT_TYPES.CAMPAIGN,
-      participants: [creatorId]
-    })
+    const [user, thread] = await Promise.all([
+      User.findById(creatorId),
+      Thread.create({
+        name,
+        chatType: THREAD_CHAT_TYPES.CAMPAIGN,
+        participants: [creatorId]
+      })
+    ]);
     const campaign = await this.create({
       name,
       createdBy: creatorId,
@@ -101,6 +105,8 @@ CampaignSchema.static('createCampaign', async function createCampaign(createObj 
       invitedPlayers: createObj.invitedPlayers || [], 
       threadId: thread._id
     });
+    user?.campaigns.push(campaign._id);
+    await user?.save();
     return campaign;
 
   } catch(err) {
