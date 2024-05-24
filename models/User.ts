@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { UserNotFoundErr, InvalidPasswordErr, EmailTakenErr, UsernameTakenErr } from "@/lib/NextError";
+import Campaign, { ICampaign } from "./Campaign";
 
 const salt_rounds = process.env.NODE_ENV === "production" ? 12 : 1;
 const salt = bcrypt.genSaltSync(salt_rounds);
@@ -65,7 +66,8 @@ export const UserSchema = new mongoose.Schema<IUser>({
 
 export interface UserModel extends mongoose.Model<IUser> {
   register(newUserDetails: RequiredUserValues): Promise<IUser>,
-  authenticate(username: string, password: string): Promise<IUser>
+  authenticate(username: string, password: string): Promise<IUser>,
+  getCampaignsFor(_id: mongoose.Types.ObjectId | string): Promise<Array<ICampaign>>
 }
 
 
@@ -102,6 +104,23 @@ UserSchema.static('authenticate', async function authenticate(username: string, 
       throw InvalidPasswordErr;
     }
   }
+})
+
+
+UserSchema.static('getCampaignsFor', async function getCampaignsFor(_id: mongoose.Types.ObjectId | string): Promise<Array<ICampaign>> {
+  try {
+    const user: IUser = this.findById(_id);
+
+    if (!user) throw UserNotFoundErr;
+  
+    return await Promise.all(user.campaigns.map(campaignId => {
+      const camp = Campaign.findById(campaignId) as Promise<ICampaign>;
+      return camp;
+    }));
+  } catch (err) {
+    throw err;
+  }
+
 })
 
 
