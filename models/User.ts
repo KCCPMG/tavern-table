@@ -93,10 +93,18 @@ UserSchema.method("getCampaigns", async function getCampaigns() {
   try {
     // (this as IUser).campaigns;
     // this.campaigns;
-    return await Promise.all(this.campaigns.map(campaignId => {
+
+    const promises: Array<Promise<ICampaign>> = this.campaigns.map(campaignId => {
       const camp = Campaign.findById(campaignId) as Promise<ICampaign>;
       return camp;
-    }));
+    })
+
+    // console.log({promises});
+
+    const campaigns = await Promise.all(promises);
+
+    return campaigns.filter(camp => !!camp);
+
   } catch(err) {
     throw err;
   }

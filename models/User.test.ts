@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import User, { IUser } from "./User";
 import { sampleUser1Details } from "./test_resources/sampleDocs";
 import { EmailTakenErr, InvalidPasswordErr, UserNotFoundErr, UsernameTakenErr } from "@/lib/NextError";
+import Campaign, { CreateCampaignProps } from "./Campaign";
 
 
 const createdUserDetails= {  
@@ -24,12 +25,21 @@ afterAll(async function(){
   mongoose.disconnect();
 })
 
+type newUserObjType = {
+  _id?: mongoose.Types.ObjectId
+}
+
+const newUserObj: newUserObjType = {};
+
 describe("A user", function() {
 
   test("can be registered", async function() {
 
     const newUser: IUser = await User.register(sampleUser1Details);
-    
+
+    // populate _id at module scope for use in other tests
+    newUserObj._id = newUser._id;
+
     // make returned IUser obj indexable by string
     const indexableNewUser:{[index: string]: any} = newUser;
 
@@ -99,6 +109,55 @@ describe("A user", function() {
       username: sampleUser1Details.username,
       password: "testpassword"
     })).rejects.toThrow(UsernameTakenErr)
+
+  })
+
+  test("can retrieve its campaigns", async function() {
+
+    // retrieve user
+    let newUser = await User.findById(newUserObj._id);
+    expect(newUser).toBeTruthy();
+    console.log(newUser);
+
+    // create campaign
+    expect(newUserObj._id).toBeTruthy();
+    const campProps: CreateCampaignProps = {
+      creatorId: newUserObj._id as mongoose.Types.ObjectId,
+      name: "Test Campaign for New User",
+      description: "Sample campaign for test on models/User.test",
+      game: "Starfinder",
+    }
+    const createdCampaign = await Campaign.createCampaign(campProps);
+    newUser = await User.findById(newUserObj._id);
+
+    console.log(createdCampaign);
+
+    // retrieve campaign
+    const campaigns = await newUser!.getCampaigns();
+    console.log(campaigns);
+    expect(campaigns instanceof Array).toBe(true);
+    expect(campaigns.length).toBe(1);
+
+    const campaign = campaigns[0];
+
+
+    // compare campaign
+    expect(campaign.createdBy).toStrictEqual(campProps.creatorId);
+    expect(campaign.name).toStrictEqual(campProps.name);
+    expect(campaign.description).toStrictEqual(campProps.description);
+    expect(campaign.game).toStrictEqual(campProps.game);
+
+
+    // delete campaign
+    await Campaign.deleteOne({_id: campaign._id});
+
+
+    // make sure no campaigns
+    newUser = await User.findById(newUserObj._id);
+    const campaignsAfterDeletion = await newUser?.getCampaigns();
+    console.log({campaignsAfterDeletion});
+    expect(campaignsAfterDeletion instanceof Array).toBe(true);
+    expect(campaignsAfterDeletion!.length).toBe(0);
 
   })
   

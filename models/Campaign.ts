@@ -73,7 +73,7 @@ const CampaignSchema = new mongoose.Schema({
   }
 })
 
-type CreateCampaignProps = {
+export type CreateCampaignProps = {
   creatorId: mongoose.Types.ObjectId,
   name: string,
   description?: string,
