@@ -49,16 +49,19 @@ export default async function Page(req: NextRequest, res: NextResponse) {
 
   const time = getTime();
 
+  
   const serverSession = await getServerSession(authOptions);
   // const user = serverSession?.user._id ? 
   //   await getUser(serverSession?.user._id) :
   //   null;
   // console.log({retrievedUser: user})
   // const campaigns = getCampaigns(serverSession?.user?._id);
+  console.log("sanity check");
 
   if (!(serverSession?.user)) {
     redirect("/");
   }
+
 
   // const initCampaignsReq = await fetch(`${process.env.NEXTAUTH_URL}/api/campaigns`);
   const initCampaignsReq = await GET(req, res);
@@ -72,12 +75,12 @@ export default async function Page(req: NextRequest, res: NextResponse) {
       {/* <p>Server Session: {JSON.stringify(serverSession, null, 2)}</p>
       <p>Username: {serverSession.user.username}</p> */}
       <p>Campaigns go here.</p>
-      <p><Campaigns initialCampaigns={initCampaigns} /></p>
+      <Campaigns initialCampaigns={initCampaigns} />
       {/* {campaigns.map(c) => <Link>{campaigns.name}</Link>} */}
       {/* <p>User: {JSON.stringify(user, null, 2)};</p> */}
       <p>{time.toString()}</p>
       {/* <p><button onClick={() => revalidatePath("campaigns/page")}>Refresh</button></p> */}
-      <p>{initCampaigns}</p>
+      {/* <p>{initCampaigns}</p> */}
     </>
   )
 }

@@ -29,7 +29,7 @@ export function AddCampaignModal() {
       })
     })
     const json = await req.json();
-    console.log(json);
+    // console.log(json);
 
   }
 
@@ -71,7 +71,7 @@ export function AddCampaignButton() {
   return (
     <>
       <button onClick={() => { 
-        console.log(displayModal);
+        // console.log(displayModal);
         setModalBody(<AddCampaignModal />)
         setShowModal(true); 
       }}>
@@ -90,7 +90,7 @@ type CampaignLinkProps = {
 export function CampaignLink({name, id} : CampaignLinkProps) {
 
   return (
-    <Link href={`/${id}`}>
+    <Link href={`/campaigns/${id}`}>
       <h5>{name}</h5>
     </Link>
   )
@@ -104,7 +104,7 @@ type CampaignsProps = {
 
 export default function Campaigns({initialCampaigns}: CampaignsProps) {
 
-  console.log({initialCampaigns});
+  // console.log({initialCampaigns});
   const [campaigns, setCampaigns] = useState<Array<ICampaign>>(initialCampaigns || []);
 
   console.log(campaigns);

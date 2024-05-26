@@ -111,7 +111,8 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt( props ) {
       // console.log("\n\njwt callback:", {...props})
-      const {user, token, session} = props;
+      // console.log("jwt callback", {props});
+      const {user, token} = props;
       // console.log("\n\njwt callback:", { user, token, session });
       if (user) {
         return {
@@ -129,6 +130,7 @@ export const authOptions: NextAuthOptions = {
       // it seems as though there will never be a user in the props, needs to be extracted from session
       const {session, token} = props;
       // console.log("\n\nnsession callback:", { user, token, session } );
+      // console.log("session callback", {props});
 
       const user = token.user || {};
 
