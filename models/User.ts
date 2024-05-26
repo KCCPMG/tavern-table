@@ -22,10 +22,21 @@ export interface IUser {
   createTime: Date,
   characters: Array<mongoose.Types.ObjectId>,
   campaigns: Array<mongoose.Types.ObjectId>,
-  friends: Array<mongoose.Types.ObjectId>,
+  friends: Array<mongoose.Types.ObjectId>
 }
 
-export const UserSchema = new mongoose.Schema<IUser>({
+export interface IUserMethods {
+  getCampaigns(): Promise<Array<ICampaign>>
+}
+
+// Create a new Model type that knows about IUserMethods...
+export interface UserModel extends mongoose.Model<IUser, {}, IUserMethods> {
+  register(newUserDetails: RequiredUserValues): Promise<IUser>,
+  authenticate(username: string, password: string): Promise<IUser>,
+  getCampaignsFor(_id: mongoose.Types.ObjectId | string): Promise<Array<ICampaign>>
+}
+
+export const UserSchema = new mongoose.Schema<IUser, UserModel, IUserMethods>({
   username: {
     type: String,
     required: true,
@@ -62,13 +73,41 @@ export const UserSchema = new mongoose.Schema<IUser>({
     type: [mongoose.Types.ObjectId],
     default: []
   },
+  // methods: {
+  //   getCampaigns: async function() {
+  //     try {
+  //       // (this as IUser).campaigns;
+  //       // this.campaigns;
+  //       return await Promise.all((this as IUser).campaigns.map(campaignId => {
+  //         const camp = Campaign.findById(campaignId) as Promise<ICampaign>;
+  //         return camp;
+  //       }));
+  //     } catch(err) {
+  //       throw err;
+  //     }
+  //   }
+  // }
 })
 
-export interface UserModel extends mongoose.Model<IUser> {
-  register(newUserDetails: RequiredUserValues): Promise<IUser>,
-  authenticate(username: string, password: string): Promise<IUser>,
-  getCampaignsFor(_id: mongoose.Types.ObjectId | string): Promise<Array<ICampaign>>
-}
+UserSchema.method("getCampaigns", async function getCampaigns() {
+  try {
+    // (this as IUser).campaigns;
+    // this.campaigns;
+    return await Promise.all(this.campaigns.map(campaignId => {
+      const camp = Campaign.findById(campaignId) as Promise<ICampaign>;
+      return camp;
+    }));
+  } catch(err) {
+    throw err;
+  }
+})
+
+
+// export interface UserModel extends mongoose.Model<IUser> {
+//   register(newUserDetails: RequiredUserValues): Promise<IUser>,
+//   authenticate(username: string, password: string): Promise<IUser>,
+//   getCampaignsFor(_id: mongoose.Types.ObjectId | string): Promise<Array<ICampaign>>
+// }
 
 
 UserSchema.static('register', async function register({username, email, password} : RequiredUserValues) : Promise<IUser> {
@@ -107,21 +146,21 @@ UserSchema.static('authenticate', async function authenticate(username: string, 
 })
 
 
-UserSchema.static('getCampaignsFor', async function getCampaignsFor(_id: mongoose.Types.ObjectId | string): Promise<Array<ICampaign>> {
-  try {
-    const user: IUser = this.findById(_id);
+// UserSchema.static('getCampaignsFor', async function getCampaignsFor(_id: mongoose.Types.ObjectId | string): Promise<Array<ICampaign>> {
+//   try {
+//     const user: IUser = this.findById(_id);
 
-    if (!user) throw UserNotFoundErr;
+//     if (!user) throw UserNotFoundErr;
   
-    return await Promise.all(user.campaigns.map(campaignId => {
-      const camp = Campaign.findById(campaignId) as Promise<ICampaign>;
-      return camp;
-    }));
-  } catch (err) {
-    throw err;
-  }
+//     return await Promise.all(user.campaigns.map(campaignId => {
+//       const camp = Campaign.findById(campaignId) as Promise<ICampaign>;
+//       return camp;
+//     }));
+//   } catch (err) {
+//     throw err;
+//   }
 
-})
+// })
 
 
 export default mongoose.models.User as UserModel || mongoose.model<IUser, UserModel>("User", UserSchema);
