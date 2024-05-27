@@ -10,6 +10,7 @@ import Link from "next/link";
 
 export function AddCampaignModal() {
 
+  const { setShowModal } = useModalContext();
   const [campaignName, setCampaignName] = useState("");
   const [game, setGame] = useState("");
 
@@ -28,6 +29,9 @@ export function AddCampaignModal() {
         }
       })
     })
+    setShowModal(false);
+    setCampaignName("");
+    setGame("");
     const json = await req.json();
     // console.log(json);
 
