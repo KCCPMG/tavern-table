@@ -1,9 +1,7 @@
 "use client";
-import { ReactEventHandler, useState } from "react";
-import Modal from "components/Modal"
+import { useState } from "react";
 import { useModalContext } from "context/ModalContext";
 import { FormEvent } from "react";
-import FormField from "./FormField";
 import { ICampaign } from "@/models/Campaign";
 import Link from "next/link";
 
@@ -20,7 +18,6 @@ export function CampaignLink({name, id} : CampaignLinkProps) {
       <h5>{name}</h5>
     </Link>
   )
-
 }
 
 
@@ -30,10 +27,7 @@ type CampaignsProps = {
 
 export default function Campaigns({initialCampaigns}: CampaignsProps) {
 
-  // console.log({initialCampaigns});
   const [campaigns, setCampaigns] = useState<Array<ICampaign>>(initialCampaigns || []);
-
-  console.log(campaigns);
 
   function AddCampaignModal() {
     const { setShowModal } = useModalContext();
@@ -59,7 +53,6 @@ export default function Campaigns({initialCampaigns}: CampaignsProps) {
       setCampaignName("");
       setGame("");
       const campaigns = await req.json();
-      console.log(campaigns);
       setCampaigns(campaigns);
     }
   
@@ -125,5 +118,4 @@ export default function Campaigns({initialCampaigns}: CampaignsProps) {
       }
     </>
   )
-
 }
