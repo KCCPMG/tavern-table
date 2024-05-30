@@ -56,7 +56,6 @@ export default async function Page(req: NextRequest, res: NextResponse) {
   //   null;
   // console.log({retrievedUser: user})
   // const campaigns = getCampaigns(serverSession?.user?._id);
-  console.log("sanity check");
 
   if (!(serverSession?.user)) {
     redirect("/");
