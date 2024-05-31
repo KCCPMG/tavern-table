@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 import CampaignComponent from "@/components/Campaign";
 import Campaign from "@/models/Campaign";
 import { redirect } from 'next/navigation';
-import CampaignNotFound from "@/components/CampaignNotFound";
+import ToastRedirect from "@/components/ToastRedirect";
 
 type PageProps = {
   params: {
@@ -28,7 +28,12 @@ export default async function Page( { params } : PageProps ) {
   })();
   
   if (!campaign) {
-    return (<CampaignNotFound />)
+    return (<ToastRedirect toasts={[
+      {
+        message: "Campaign not found",
+        status: "error"
+      }
+    ]}  redirect="/campaigns"  />)
   }
 
   // check user permission to see campaign
