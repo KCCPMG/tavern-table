@@ -28,12 +28,16 @@ export default async function Page( { params } : PageProps ) {
   })();
   
   if (!campaign) {
-    return (<ToastRedirect toasts={[
-      {
-        message: "Campaign not found",
-        status: "error"
-      }
-    ]}  redirect="/campaigns"  />)
+    return (
+      <ToastRedirect 
+        toasts={[
+          {
+            message: "Campaign not found",
+            status: "error"
+          }
+        ]}  
+        redirect="/campaigns"  
+      />)
   }
 
   // check user permission to see campaign
