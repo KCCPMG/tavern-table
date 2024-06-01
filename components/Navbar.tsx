@@ -12,12 +12,15 @@ type LoggedInPanelProps = {
 function LoggedInPanel({username}: LoggedInPanelProps) {
   return (
     <>
-      <span className="text-white text-2xl px-2">
-        {username}
-      </span>
-      <span className="text-white text-2xl px-2" onClick={() => {signOut();}}>
-        Log Out
-      </span>
+      <Link className="text-white text-2xl px-2" href="/campaigns">
+        Campaigns
+      </Link>
+      <Link className="text-white text-2xl px-2" href={"/"} onClick={(e) => {
+        e.preventDefault();
+        signOut();
+      }}>
+        Log Out {username}
+      </Link>
     </>
   )
 }
