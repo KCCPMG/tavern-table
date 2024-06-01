@@ -4,12 +4,9 @@ import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react"
 
 
-type LoggedInPanelProps = {
-  username: string
-}
 
 
-function LoggedInPanel({username}: LoggedInPanelProps) {
+function LoggedInPanel() {
   return (
     <>
       <Link className="text-white text-2xl px-2" href="/campaigns">
@@ -19,7 +16,7 @@ function LoggedInPanel({username}: LoggedInPanelProps) {
         e.preventDefault();
         signOut();
       }}>
-        Log Out {username}
+        Log Out
       </Link>
     </>
   )
@@ -40,10 +37,12 @@ export default function Navbar() {
 
   return (
     <nav className="bg-black w-full p-2 flex flex-initial justify-between">
-      <span className="text-white text-2xl">Navbar</span>
+      <span className="text-white text-2xl">
+        Tavern Table {session?.user && `- ${session.user.username}`}
+      </span>
       <div>
         {session?.user ? 
-        <LoggedInPanel username={session.user.username!} /> : 
+        <LoggedInPanel /> : 
         <LoggedOutPanel />}
       </div>
     </nav>
