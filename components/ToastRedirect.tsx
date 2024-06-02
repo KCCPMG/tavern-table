@@ -11,7 +11,7 @@ type ToastRedirectProps = {
 }
 
 
-export default function CampaignNotFound(
+export default function ToastRedirect(
   { toasts, redirect }: ToastRedirectProps 
 ) {
 
