@@ -25,6 +25,13 @@ export interface IUser {
   friends: Array<mongoose.Types.ObjectId>
 }
 
+// A limited user to be returned by a search
+export interface IPerson {
+  _id: mongoose.Types.ObjectId,
+  username: string,
+  email: string,
+}
+
 export interface IUserMethods {
   getCampaigns(): Promise<Array<ICampaign>>
 }
@@ -33,7 +40,8 @@ export interface IUserMethods {
 export interface UserModel extends mongoose.Model<IUser, {}, IUserMethods> {
   register(newUserDetails: RequiredUserValues): Promise<IUser>,
   authenticate(username: string, password: string): Promise<IUser>,
-  getCampaignsFor(_id: mongoose.Types.ObjectId | string): Promise<Array<ICampaign>>
+  getCampaignsFor(_id: mongoose.Types.ObjectId | string): Promise<Array<ICampaign>>,
+  getPerson(_id: mongoose.Types.ObjectId | string): Promise<IPerson>
 }
 
 export const UserSchema = new mongoose.Schema<IUser, UserModel, IUserMethods>({
@@ -151,6 +159,24 @@ UserSchema.static('authenticate', async function authenticate(username: string, 
       throw InvalidPasswordErr;
     }
   }
+})
+
+
+
+UserSchema.static('getPerson', async function getPerson(_id: mongoose.Types.ObjectId | string) {
+  try {
+    const person: IUser | null = await this.findById({_id});
+    if (!person) throw UserNotFoundErr;
+    return {
+      _id: person._id,
+      email: person.email,
+      username: person.username
+    }
+    // need to now write test
+  } catch(err) {
+    throw err;
+  }
+
 })
 
 
