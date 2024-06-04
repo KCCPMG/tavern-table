@@ -3,7 +3,7 @@
 import { authOptions } from "@/api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
 import CampaignComponent from "@/components/Campaign";
-import Campaign from "@/models/Campaign";
+import Campaign, { ICampaign } from "@/models/Campaign";
 import { redirect } from 'next/navigation';
 import ToastRedirect from "@/components/ToastRedirect";
 
@@ -48,7 +48,7 @@ export default async function Page( { params } : PageProps ) {
   return (
     <>
       Your campaign Id is {params.id}
-      <CampaignComponent initCampaign={campaign} />
+      <CampaignComponent initCampaign={campaign as ICampaign} />
     </>
   )
 }
