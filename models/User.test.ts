@@ -117,7 +117,6 @@ describe("A user", function() {
     // retrieve user
     let newUser = await User.findById(newUserObj._id);
     expect(newUser).toBeTruthy();
-    console.log(newUser);
 
     // create campaign
     expect(newUserObj._id).toBeTruthy();
@@ -134,7 +133,6 @@ describe("A user", function() {
 
     // retrieve campaign
     const campaigns = await newUser!.getCampaigns();
-    console.log(campaigns);
     expect(campaigns instanceof Array).toBe(true);
     expect(campaigns.length).toBe(1);
 
@@ -159,6 +157,15 @@ describe("A user", function() {
     expect(campaignsAfterDeletion instanceof Array).toBe(true);
     expect(campaignsAfterDeletion!.length).toBe(0);
 
+  })
+
+  test("can be retrieved as a person", async function() {
+    const person = await User.getPerson(newUserObj!._id as mongoose.Types.ObjectId);
+    expect(person).toStrictEqual({
+      _id: newUserObj._id,
+      email: sampleUser1Details.email,
+      username: sampleUser1Details.username
+    })
   })
   
   test("can be deleted", async function() {
