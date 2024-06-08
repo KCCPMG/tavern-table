@@ -1,7 +1,16 @@
 "use client";
 
 import { ICampaign } from "@/models/Campaign";
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
+import { useModalContext } from "context/ModalContext";
+
+
+function InvitePlayersModal() {
+  return (
+    <h1>Placeholder Text</h1>
+  )
+}
+
 
 type CampaignProps = {
   initCampaign: ICampaign
@@ -9,7 +18,15 @@ type CampaignProps = {
 
 export default function Campaign({initCampaign} : CampaignProps) {
 
+  const { setShowModal, setModalBody } = useModalContext();
+
   const [campaign, setCampaign] = useState<ICampaign>(initCampaign);
+
+  const handleInvitePlayersClick = (e: MouseEvent) => {
+    e.preventDefault();
+    setShowModal(true);
+    setModalBody(InvitePlayersModal);
+  }
 
   return (
     <>
@@ -29,7 +46,7 @@ export default function Campaign({initCampaign} : CampaignProps) {
         Invited Players: {campaign.invitedPlayers.map(player => player.toString()).join(", ")}
       </h4> 
       }
-      <button>Invite Players</button>
+      <button onClick={handleInvitePlayersClick}>Invite Players</button>
       <h4>Description:</h4>
       <p>{campaign.description}</p>
       <hr />
