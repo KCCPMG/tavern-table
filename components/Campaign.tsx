@@ -1,13 +1,9 @@
 "use client";
 
 import { ICampaign } from "@/models/Campaign";
-import { MouseEvent, ChangeEventHandler, ChangeEvent, useState } from "react";
+import { MouseEvent, ChangeEventHandler, ChangeEvent, useState, useEffect } from "react";
 import { useModalContext } from "context/ModalContext";
 import { IPerson } from "@/models/User";
-import FormField from "./FormField";
-
-
-
 
 
 type CampaignProps = {
@@ -23,6 +19,23 @@ export default function Campaign({initCampaign} : CampaignProps) {
   const [foundPersons, setFoundPersons] = useState<Array<IPerson>>([])
 
   
+  useEffect(() => {
+    try { 
+      if (searchVal.length == 0) return;
+      // else
+      const response = fetch("/api/people?" + new URLSearchParams({
+        "search": searchVal
+      }));
+      response.then(res => res.json())
+      .then(json => {
+        console.log(json);
+      })
+    } catch (err) {
+
+    }
+  }, [searchVal]);
+
+
   function InvitePlayersModal() {
   
     const handleInputChange: ChangeEventHandler<HTMLInputElement> = 
@@ -30,9 +43,6 @@ export default function Campaign({initCampaign} : CampaignProps) {
         e.preventDefault();
         console.log(e.target.value);
         setSearchVal(e.target.value);
-        const response = await fetch("/api/people");
-        const json = await response.json();
-        console.log(json);
       }
   
     return (
