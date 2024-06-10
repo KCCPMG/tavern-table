@@ -7,7 +7,7 @@ const salt_rounds = process.env.NODE_ENV === "production" ? 12 : 1;
 const salt = bcrypt.genSaltSync(salt_rounds);
 
 
-const DEFAULT_IMAGES = {
+export const DEFAULT_IMAGES = {
   A: "https://dd7tel2830j4w.cloudfront.net/f1510009325845x824160452699288700/A.png",
   B: "https://dd7tel2830j4w.cloudfront.net/f1512859392159x541018578223884100/B.png",
   C: "https://dd7tel2830j4w.cloudfront.net/f1512859409521x374254034366458600/C.png",

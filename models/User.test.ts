@@ -1,6 +1,6 @@
 import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
-import User, { IUser } from "./User";
+import User, { IUser, DEFAULT_IMAGES } from "./User";
 import { sampleUser1Details } from "./test_resources/sampleDocs";
 import { EmailTakenErr, InvalidPasswordErr, UserNotFoundErr, UsernameTakenErr } from "@/lib/NextError";
 import Campaign, { CreateCampaignProps } from "./Campaign";
@@ -161,10 +161,12 @@ describe("A user", function() {
 
   test("can be retrieved as a person", async function() {
     const person = await User.getPerson(newUserObj!._id as mongoose.Types.ObjectId);
+    
     expect(person).toStrictEqual({
       _id: newUserObj._id,
       email: sampleUser1Details.email,
-      username: sampleUser1Details.username
+      username: sampleUser1Details.username,
+      imageUrl: DEFAULT_IMAGES[sampleUser1Details.username[0].toUpperCase()]
     })
   })
   
