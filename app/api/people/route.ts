@@ -1,4 +1,4 @@
-import User from "models/User";
+import User, { IPerson } from "models/User";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -17,7 +17,11 @@ export async function GET(req: NextRequest) {
         {username: re}
       ]
     });
-    return Response.json(people);
+    const scaledDownPeople: Array<IPerson> = people.map(person => {
+      const { _id, username, email } = person;
+      return { _id, username, email };
+    })
+    return Response.json(scaledDownPeople);
 
   } catch(err) {
     return Response.error();
