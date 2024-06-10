@@ -19,6 +19,7 @@ declare module "next-auth" {
       username?: string,
       _id?: string,
       email?: string,
+      imageUrl?: string,
       characters: Array<mongoose.Types.ObjectId>,
       campaigns: Array<mongoose.Types.ObjectId>,
       friends: Array<mongoose.Types.ObjectId>,

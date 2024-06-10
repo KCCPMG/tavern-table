@@ -18,8 +18,8 @@ export async function GET(req: NextRequest) {
       ]
     });
     const scaledDownPeople: Array<IPerson> = people.map(person => {
-      const { _id, username, email } = person;
-      return { _id, username, email };
+      const { _id, username, email, imageUrl } = person;
+      return { _id, username, email, imageUrl };
     })
     return Response.json(scaledDownPeople);
 
