@@ -5,10 +5,20 @@ export async function GET(req: NextRequest) {
 
   try {
     const searchParams = req.nextUrl.searchParams;
-    const query = searchParams.get('search')
+    const queryString = searchParams.get('search');
 
-    return Response.json(`You said ${query}`)
-    // return Response.json("Test message from api/people - GET")
+    if (!queryString) throw "No input given";
+
+    const re = new RegExp(queryString, "gi");
+
+    const people = await User.find({
+      $or: [
+        {email: re},
+        {username: re}
+      ]
+    });
+    return Response.json(people);
+
   } catch(err) {
     return Response.error();
   }
