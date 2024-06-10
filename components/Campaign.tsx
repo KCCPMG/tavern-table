@@ -15,36 +15,42 @@ export default function Campaign({initCampaign} : CampaignProps) {
   const { setShowModal, setModalBody } = useModalContext();
 
   const [campaign, setCampaign] = useState<ICampaign>(initCampaign);
-  const [searchVal, setSearchVal] = useState("");
-  const [foundPersons, setFoundPersons] = useState<Array<IPerson>>([])
+
 
   
-  useEffect(() => {
-    try { 
-      if (searchVal.length == 0) return;
-      // else
-      const response = fetch("/api/people?" + new URLSearchParams({
-        "search": searchVal
-      }));
-      response.then(res => res.json())
-      .then(json => {
-        console.log(json);
-      })
-    } catch (err) {
+  
 
-    }
-  }, [searchVal]);
 
+
+  
 
   function InvitePlayersModal() {
-  
+    const [searchVal, setSearchVal] = useState("");
+    const [foundPersons, setFoundPersons] = useState<Array<IPerson>>([])
+
     const handleInputChange: ChangeEventHandler<HTMLInputElement> = 
       async (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
-        console.log(e.target.value);
         setSearchVal(e.target.value);
       }
-  
+
+    useEffect(() => {
+      try { 
+        if (searchVal.length == 0) return;
+        // else
+        const response = fetch("/api/people?" + new URLSearchParams({
+          "search": searchVal
+        }));
+        response.then(res => res.json())
+        .then(json => {
+          console.log(json);
+          setFoundPersons(json);
+        })
+      } catch (err) {
+        console.log(err);
+      }
+    }, [searchVal]);
+
     return (
       <form>
         <label>Search by username or email</label>
@@ -52,7 +58,22 @@ export default function Campaign({initCampaign} : CampaignProps) {
           type="text" 
           onChange={handleInputChange} 
           placeholder="Username or email" 
+          value={searchVal}
         />
+        {foundPersons.map(fp => {
+          console.log(fp);
+          return (
+            <div>
+              <div className="inline-block p-2">
+                <img className="h-6 w-6" src={fp.imageUrl} />
+              </div>
+              <div className="inline-block p-2">
+                <p>{fp.username}</p>
+                <p>{fp.email}</p>
+              </div>
+            </div>
+          )
+        })}
       </form>
     )
   }
@@ -60,7 +81,12 @@ export default function Campaign({initCampaign} : CampaignProps) {
   const handleInvitePlayersClick = (e: MouseEvent) => {
     e.preventDefault();
     setShowModal(true);
-    setModalBody(InvitePlayersModal);
+    setModalBody(
+      <InvitePlayersModal 
+
+        // handleInputChange={handle}
+      />
+    );
   }
 
   return (

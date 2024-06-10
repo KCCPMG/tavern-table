@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
         {email: re},
         {username: re}
       ]
-    });
+    }).limit(5);
     const scaledDownPeople: Array<IPerson> = people.map(person => {
       const { _id, username, email, imageUrl } = person;
       return { _id, username, email, imageUrl };
