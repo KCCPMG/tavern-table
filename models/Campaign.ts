@@ -1,13 +1,14 @@
 import mongoose from "mongoose";
 import Thread from "./Thread";
-import User from "./User";
+import User, { IPerson } from "./User";
 import { THREAD_CHAT_TYPES } from "./constants";
 
 export interface ICampaign {
   _id: mongoose.Types.ObjectId,
   name: string, 
   createdBy: mongoose.Types.ObjectId, 
-  createdOn: Date, description: string, 
+  createdOn: Date, 
+  description: string, 
   dm: Array<mongoose.Types.ObjectId>,
   handouts: Array<mongoose.Types.ObjectId>,
   game: string,
@@ -73,6 +74,23 @@ const CampaignSchema = new mongoose.Schema({
   }
 })
 
+export type IReactCampaign = {
+  _id: mongoose.Types.ObjectId,
+  name: string, 
+  createdBy: IPerson, 
+  createdOn: Date, 
+  description: string, 
+  dm: Array<mongoose.Types.ObjectId>,
+  handouts: Array<mongoose.Types.ObjectId>,
+  game: string,
+  players: Array<IPerson>,
+  invitedPlayers: Array<IPerson>,
+  journalEntries: Array<mongoose.Types.ObjectId>,
+  index: Array<mongoose.Types.ObjectId>,
+  threadId: mongoose.Types.ObjectId
+}
+
+
 export type CreateCampaignProps = {
   creatorId: mongoose.Types.ObjectId,
   name: string,
@@ -83,6 +101,7 @@ export type CreateCampaignProps = {
 
 export interface CampaignModel extends mongoose.Model<ICampaign> {
   createCampaign(newCampaignDetails: CreateCampaignProps): Promise<ICampaign>,
+  getIReactCampaign(campaignId: mongoose.Types.ObjectId): Promise<IReactCampaign>
 }
 
 CampaignSchema.static('createCampaign', async function createCampaign(createObj : CreateCampaignProps) : Promise<ICampaign> {
@@ -112,8 +131,41 @@ CampaignSchema.static('createCampaign', async function createCampaign(createObj 
   } catch(err) {
     throw(err);
   }
-
 }) 
+
+
+CampaignSchema.static('getIReactCampaign', async function getIReactCampaign(campaignId : mongoose.Types.ObjectId) : Promise<IReactCampaign> {
+  const [campaign, users] = await Promise.all([
+    this.findById(campaignId),
+    this.findById(campaignId)
+      .then((camp: ICampaign) => {
+        return Promise.all([
+          User.getPerson(camp.createdBy),
+          Promise.all(camp.dm.map(dm => User.getPerson(dm))),
+          Promise.all(camp.dm.map(dm => User.getPerson(dm))),
+          Promise.all(camp.dm.map(dm => User.getPerson(dm)))
+        ])
+      })
+  ]);
+
+  const scaledCampaign: IReactCampaign = {
+    _id: campaign._id,
+    name: campaign.name, 
+    createdBy: users[0], 
+    createdOn: campaign.createdOn, 
+    description: campaign.description, 
+    dm: users[1],
+    handouts: campaign.handouts,
+    game: campaign.game,
+    players: users[2],
+    invitedPlayers: users[3],
+    journalEntries: campaign.journalEntries,
+    index: campaign.index,
+    threadId: campaign.threadId
+  }
+
+  return scaledCampaign;
+})
 
 export default mongoose.models.Campaign as CampaignModel || mongoose.model<ICampaign, CampaignModel>('Campaign', CampaignSchema);
 
