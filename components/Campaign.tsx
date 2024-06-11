@@ -1,6 +1,6 @@
 "use client";
 
-import { ICampaign } from "@/models/Campaign";
+import { IReactCampaign } from "@/models/Campaign";
 import { MouseEvent, ChangeEventHandler, ChangeEvent, useState, useEffect } from "react";
 import { useModalContext } from "context/ModalContext";
 import { IPerson } from "@/models/User";
@@ -130,14 +130,15 @@ function InvitePlayersModal({ campaignName, campaignId }: InvitePlayersModalProp
 
 
 type CampaignProps = {
-  initCampaign: ICampaign
+  initCampaign: IReactCampaign,
 }
 
 export default function Campaign({initCampaign} : CampaignProps) {
 
   const { setShowModal, setModalBody } = useModalContext();
-  const [campaign, setCampaign] = useState<ICampaign>(initCampaign);
+  const [campaign, setCampaign] = useState<IReactCampaign>(initCampaign);
 
+  console.log(initCampaign);
 
   const handleInvitePlayersClick = (e: MouseEvent) => {
     e.preventDefault();
@@ -150,17 +151,17 @@ export default function Campaign({initCampaign} : CampaignProps) {
       <h1>{campaign.name}</h1>
       <h4>A {campaign.game} Campaign</h4>
       <h4>
-        Created by {campaign.createdBy.toString()} on {campaign.createdOn.toDateString()}
+        Created by {campaign.createdBy.username} on {campaign.createdOn.toDateString()}
       </h4>
       <h4>
-        Dungeon Master{campaign.dm.length != 1 ? "s" : ""}: {campaign.dm.map(dm => dm.toString()).join(", ")}
+        Dungeon Master{campaign.dm.length != 1 ? "s" : ""}: {campaign.dm.map(dm => dm.username).join(", ")}
       </h4>
       <h4>
-        Players: {campaign.players.map(player => player.toString()).join(", ")}
+        Players: {campaign.players.map(player => player.username).join(", ")}
       </h4>
       {campaign.invitedPlayers.length > 0 && 
       <h4>
-        Invited Players: {campaign.invitedPlayers.map(player => player.toString()).join(", ")}
+        Invited Players: {campaign.invitedPlayers.map(player => player.username).join(", ")}
       </h4> 
       }
       <button onClick={handleInvitePlayersClick}>Invite Players</button>

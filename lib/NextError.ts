@@ -13,10 +13,13 @@ export class NextError extends Error {
   }
 }
 
+// 400
 export const UsernameTakenErr: NextError = new NextError("A user already exists with that username", 400);
-
 export const EmailTakenErr: NextError = new NextError("A user already exists with that email", 400);
 
-export const UserNotFoundErr: NextError = new NextError("User not found", 404);
-
+// 401
 export const InvalidPasswordErr: NextError = new NextError("Invalid Password", 401);
+
+// 404
+export const UserNotFoundErr: NextError = new NextError("User not found", 404);
+export const CampaignNotFoundErr: NextError = new NextError("Campaign not found", 404);

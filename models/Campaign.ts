@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Thread from "./Thread";
 import User, { IPerson } from "./User";
 import { THREAD_CHAT_TYPES } from "./constants";
+import { CampaignNotFoundErr } from "@/lib/NextError";
 
 export interface ICampaign {
   _id: mongoose.Types.ObjectId,
@@ -75,19 +76,19 @@ const CampaignSchema = new mongoose.Schema({
 })
 
 export type IReactCampaign = {
-  _id: mongoose.Types.ObjectId,
+  _id: string,
   name: string, 
   createdBy: IPerson, 
   createdOn: Date, 
   description: string, 
-  dm: Array<mongoose.Types.ObjectId>,
-  handouts: Array<mongoose.Types.ObjectId>,
+  dm: Array<IPerson>,
+  handouts: Array<string>,
   game: string,
   players: Array<IPerson>,
   invitedPlayers: Array<IPerson>,
-  journalEntries: Array<mongoose.Types.ObjectId>,
-  index: Array<mongoose.Types.ObjectId>,
-  threadId: mongoose.Types.ObjectId
+  journalEntries: Array<string>,
+  index: Array<string>,
+  threadId: string
 }
 
 
@@ -101,7 +102,7 @@ export type CreateCampaignProps = {
 
 export interface CampaignModel extends mongoose.Model<ICampaign> {
   createCampaign(newCampaignDetails: CreateCampaignProps): Promise<ICampaign>,
-  getIReactCampaign(campaignId: mongoose.Types.ObjectId): Promise<IReactCampaign>
+  getIReactCampaign(campaignId: string): Promise<IReactCampaign>
 }
 
 CampaignSchema.static('createCampaign', async function createCampaign(createObj : CreateCampaignProps) : Promise<ICampaign> {
@@ -134,7 +135,8 @@ CampaignSchema.static('createCampaign', async function createCampaign(createObj 
 }) 
 
 
-CampaignSchema.static('getIReactCampaign', async function getIReactCampaign(campaignId : mongoose.Types.ObjectId) : Promise<IReactCampaign> {
+CampaignSchema.static('getIReactCampaign', async function getIReactCampaign(campaignId : string) : Promise<IReactCampaign> {
+  
   const [campaign, users] = await Promise.all([
     this.findById(campaignId),
     this.findById(campaignId)
@@ -148,21 +150,27 @@ CampaignSchema.static('getIReactCampaign', async function getIReactCampaign(camp
       })
   ]);
 
+  if(!campaign) throw CampaignNotFoundErr;
+
+  const castCampaign = campaign as ICampaign;
+
   const scaledCampaign: IReactCampaign = {
-    _id: campaign._id,
-    name: campaign.name, 
+    _id: castCampaign._id.toString(),
+    name: castCampaign.name, 
     createdBy: users[0], 
-    createdOn: campaign.createdOn, 
-    description: campaign.description, 
+    createdOn: castCampaign.createdOn, 
+    description: castCampaign.description, 
     dm: users[1],
-    handouts: campaign.handouts,
-    game: campaign.game,
+    handouts: castCampaign.handouts.map(h => h.toString()),
+    game: castCampaign.game,
     players: users[2],
     invitedPlayers: users[3],
-    journalEntries: campaign.journalEntries,
-    index: campaign.index,
-    threadId: campaign.threadId
+    journalEntries: castCampaign.journalEntries.map(j => j.toString()),
+    index: castCampaign.index.map(i => i.toString()),
+    threadId: castCampaign.threadId.toString()
   }
+
+  console.log({scaledCampaign})
 
   return scaledCampaign;
 })

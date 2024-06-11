@@ -3,7 +3,7 @@
 import { authOptions } from "@/api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
 import CampaignComponent from "@/components/Campaign";
-import Campaign, { ICampaign } from "@/models/Campaign";
+import Campaign, { IReactCampaign } from "@/models/Campaign";
 import { redirect } from 'next/navigation';
 import ToastRedirect from "@/components/ToastRedirect";
 
@@ -20,7 +20,8 @@ export default async function Page( { params } : PageProps ) {
 
   const campaign = await (async () => {
     try {
-      const tryCampaign = await Campaign.findById(params.id);
+      const tryCampaign = await Campaign.getIReactCampaign(params.id);
+      console.log(tryCampaign);
       return tryCampaign;
     } catch(err) {
       return null;
@@ -48,7 +49,7 @@ export default async function Page( { params } : PageProps ) {
   return (
     <>
       Your campaign Id is {params.id}
-      <CampaignComponent initCampaign={campaign as ICampaign} />
+      <CampaignComponent initCampaign={campaign as IReactCampaign} />
     </>
   )
 }

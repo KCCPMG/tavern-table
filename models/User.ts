@@ -57,7 +57,7 @@ export interface IUser {
 
 // A limited user to be returned by a search
 export interface IPerson {
-  _id: mongoose.Types.ObjectId,
+  _id: string,
   username: string,
   email: string,
   imageUrl: string
@@ -203,12 +203,12 @@ UserSchema.static('getPerson', async function getPerson(_id: mongoose.Types.Obje
     const person: IUser | null = await this.findById({_id});
     if (!person) throw UserNotFoundErr;
     return {
-      _id: person._id,
+      _id: person._id.toString(),
       email: person.email,
       username: person.username,
       imageUrl: person.imageUrl
     }
-    // need to now write test
+
   } catch(err) {
     throw err;
   }
