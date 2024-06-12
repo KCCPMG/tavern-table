@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
-import { MESSAGE_TYPES } from "./constants";
-
-const MESSAGE_TYPE_ARR = Object.values(MESSAGE_TYPES);
+import { MESSAGE_TYPE_ARR, RESPONSE_MESSAGE_TYPE_ARR } from "./constants";
 
 
 /* Interface and Schema Declarations */
@@ -72,7 +70,7 @@ const MessageSchema = new mongoose.Schema({
     },
     messageType: {
       type: String,
-      enum: ["BEFRIEND_ACCEPT", "BEFRIEND_REJECT", "CAMPAIGN_INVITE_ACCEPT", "CAMPAIGN_INVITE_REJECT", "ROOM_INVITE_ACCEPT", "ROOM_INVITE_REJECT"]
+      enum: RESPONSE_MESSAGE_TYPE_ARR
     }
   },
   readBy: {
@@ -100,6 +98,7 @@ export type IReactMessage = {
 }
 
 export type MessageType = typeof MESSAGE_TYPE_ARR[number];
+export type ResponseMessageType = typeof RESPONSE_MESSAGE_TYPE_ARR[number];
 
 export type RequiredMessageValues = {
   sender: mongoose.Types.ObjectId,
@@ -139,7 +138,16 @@ MessageSchema.static('getIReactMessage', async function getIReactMessage(id): Pr
   return message.toIReactMessage();
 })
 
-
+// Create and send a regular text message
+MessageSchema.static('createTextMessage', async function createTextMessage(senderId, recipientId, text): Promise<IMessage> {
+  const message = await this.create({
+    sender: senderId,
+    directRecipient: recipientId,
+    text,
+  })
+  await message.save();
+  return message;
+})
 
 
 /* Default Export and/or modeling of Message */
