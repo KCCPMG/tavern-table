@@ -20,6 +20,22 @@ export interface IMessage {
   readBy: Array<mongoose.Types.ObjectId>
 }
 
+export type IReactMessage = {
+  _id: string,
+  sender: string,
+  directRecipient?: string,
+  campaignId?: string,
+  threadIds: Array<string>,
+  sendTime: Date,
+  messageType: typeof MESSAGE_TYPE_ARR[number],
+  text?: string,
+  response?: {
+    messageId: string,
+    messageType: typeof MESSAGE_TYPE_ARR[number]
+  },
+  readBy: Array<string>
+}
+
 export type MessageType = typeof MESSAGE_TYPE_ARR[number];
 
 export type RequiredMessageValues = {
@@ -29,7 +45,16 @@ export type RequiredMessageValues = {
   text: string
 }
 
-const Message = new mongoose.Schema({
+export interface IMessageMethods {
+  // stub
+}
+
+// create a new model that knows about IMessageMethods
+export interface MessageModel extends mongoose.Model<IMessage, {}, IMessageMethods> {
+
+}
+
+const MessageSchema = new mongoose.Schema({
   sender: {
     type: mongoose.Types.ObjectId,
     required: true
@@ -76,6 +101,13 @@ const Message = new mongoose.Schema({
   }
 })
 
+export interface IMessageMethods {
+  // stub
+}
 
+// create a new model that knows about IMessageMethods
+export interface MessageModel extends mongoose.Model<IMessage, {}, IMessageMethods> {
 
-export default mongoose.models.Message || mongoose.model("Message", Message);
+}
+
+export default mongoose.models.Message as MessageModel || mongoose.model<IMessage, MessageModel>("Message", MessageSchema);
