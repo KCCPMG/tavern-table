@@ -4,6 +4,9 @@ import { MESSAGE_TYPES } from "./constants";
 const MESSAGE_TYPE_ARR = Object.values(MESSAGE_TYPES);
 
 
+/* Interface and Schema Declarations */
+
+// basic interface
 export interface IMessage {
   _id: mongoose.Types.ObjectId,
   sender: mongoose.Types.ObjectId,
@@ -11,45 +14,21 @@ export interface IMessage {
   campaignId?: mongoose.Types.ObjectId,
   threadIds: Array<mongoose.Types.ObjectId>,
   sendTime: Date,
-  messageType: typeof MESSAGE_TYPE_ARR[number],
+  messageType: MessageType,
   text?: string,
   response?: {
     messageId: mongoose.Types.ObjectId,
-    messageType: typeof MESSAGE_TYPE_ARR[number]
+    messageType: MessageType
   },
   readBy: Array<mongoose.Types.ObjectId>
 }
 
-export type IReactMessage = {
-  _id: string,
-  sender: string,
-  directRecipient?: string,
-  campaignId?: string,
-  threadIds: Array<string>,
-  sendTime: Date,
-  messageType: typeof MESSAGE_TYPE_ARR[number],
-  text?: string,
-  response?: {
-    messageId: string,
-    messageType: typeof MESSAGE_TYPE_ARR[number]
-  },
-  readBy: Array<string>
-}
-
-export type MessageType = typeof MESSAGE_TYPE_ARR[number];
-
-export type RequiredMessageValues = {
-  sender: mongoose.Types.ObjectId,
-  threadIds: Array<mongoose.Types.ObjectId>,
-  messageType: MessageType,
-  text: string
-}
-
+// instance methods
 export interface IMessageMethods {
   // stub
 }
 
-// create a new model that knows about IMessageMethods
+// create a new model that knows about IMessageMethods, declare static methods
 export interface MessageModel extends mongoose.Model<IMessage, {}, IMessageMethods> {
 
 }
@@ -101,15 +80,38 @@ const MessageSchema = new mongoose.Schema({
   }
 })
 
-export interface IMessageMethods {
-  // stub
+
+/* Supporting Types and Values */
+
+export type IReactMessage = {
+  _id: string,
+  sender: string,
+  directRecipient?: string,
+  campaignId?: string,
+  threadIds: Array<string>,
+  sendTime: Date,
+  messageType: MessageType
+  text?: string,
+  response?: {
+    messageId: string,
+    messageType: MessageType
+  },
+  readBy: Array<string>
 }
 
-// create a new model that knows about IMessageMethods
-export interface MessageModel extends mongoose.Model<IMessage, {}, IMessageMethods> {
+export type MessageType = typeof MESSAGE_TYPE_ARR[number];
 
+export type RequiredMessageValues = {
+  sender: mongoose.Types.ObjectId,
+  threadIds: Array<mongoose.Types.ObjectId>,
+  messageType: MessageType,
+  text: string
 }
 
+
+/* Instance Methods */
+
+// convert an IMessage to an IReactMessage
 MessageSchema.method('toIReactMessage', function toIReactMessage(): IReactMessage {
   return {
     _id: this._id.toString(),
@@ -122,10 +124,23 @@ MessageSchema.method('toIReactMessage', function toIReactMessage(): IReactMessag
     text: this.text || undefined,
     response: this.response ? {
       messageId: this.response.messageId!.toString(),
-      messageType: this.response.messageType as typeof MESSAGE_TYPE_ARR[number]
+      messageType: this.response.messageType as MessageType
     } : undefined,
     readBy: this.readBy.map(r => r.toString())
   }
 })
 
+
+/* Static Methods */
+
+// Retrieve a message as an IReactMessage
+MessageSchema.static('getIReactMessage', async function getIReactMessage(id): Promise<IReactMessage> {
+  const message = await this.findById(id);
+  return message.toIReactMessage();
+})
+
+
+
+
+/* Default Export and/or modeling of Message */
 export default mongoose.models.Message as MessageModel || mongoose.model<IMessage, MessageModel>("Message", MessageSchema);
