@@ -110,4 +110,22 @@ export interface MessageModel extends mongoose.Model<IMessage, {}, IMessageMetho
 
 }
 
+MessageSchema.method('toIReactMessage', function toIReactMessage(): IReactMessage {
+  return {
+    _id: this._id.toString(),
+    sender: this.sender.toString(),
+    directRecipient: this.directRecipient?.toString() || undefined,
+    campaignId: this.campaignId?.toString() || undefined,
+    threadIds: this.threadIds.map(t => t.toString()),
+    sendTime: this.sendTime,
+    messageType: this.messageType,
+    text: this.text || undefined,
+    response: this.response ? {
+      messageId: this.response.messageId!.toString(),
+      messageType: this.response.messageType as typeof MESSAGE_TYPE_ARR[number]
+    } : undefined,
+    readBy: this.readBy.map(r => r.toString())
+  }
+})
+
 export default mongoose.models.Message as MessageModel || mongoose.model<IMessage, MessageModel>("Message", MessageSchema);
