@@ -63,6 +63,7 @@ export interface IPerson {
   imageUrl: string
 }
 
+// add instance methods
 export interface IUserMethods {
   getCampaigns(): Promise<Array<ICampaign>>
 }
