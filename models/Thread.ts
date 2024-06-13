@@ -22,7 +22,7 @@ export interface IThreadMethods {
 
 // create a new model that incorporates IThreadMethods, declare static methods
 export interface ThreadModel extends mongoose.Model<IThread, {}, IThreadMethods> {
-  // stub
+  findOrCreateThreadId({ threadId, participants, chatType }: findOrCreateThreadIdObj ): Promise<IThread>
 }
 
 // main schema
@@ -60,9 +60,41 @@ export type RequiredThreadValues = {
 
 
 /* Static Methods */
-// ThreadSchema.static('findOrCreateThread', async function() {
 
-// })
+type findOrCreateThreadIdObj = {
+  threadId?: string,
+  participants: Array<string>,
+  chatType: typeof THREAD_CHAT_TYPES_ARRAY[number]
+}
+
+ThreadSchema.static('findOrCreateThreadId', async function findOrCreateThread(
+  { threadId, participants, chatType }: findOrCreateThreadIdObj 
+): Promise<string> {
+
+  try {
+    if (threadId) return (threadId);
+
+    // else try to find threadId
+    const foundThread = await this.findOne({
+      $and: [
+        { chatType: chatType },
+        { participants: { $in: participants } }
+      ]
+    })
+    
+    if (foundThread) return (foundThread._id);
+    // else
+    const newThread = await this.create({
+      participants,
+      chatType: THREAD_CHAT_TYPES.CHAT
+    })
+    return newThread._id;
+
+  } catch(err) {
+    console.log(err);
+    throw err;
+  }
+})
 
 
 

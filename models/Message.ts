@@ -155,32 +155,10 @@ MessageSchema.static('createTextMessage', async function createTextMessage(
 ): Promise<IMessage> {
 
   try {
-    const retrievedThreadId = await new Promise(async (res, rej) => {
-  
-      if (threadId) res(threadId);
-  
-      if (!threadId) {
-        // try to find threadId
-        const foundThread = await Thread.findOne({
-          $and: [
-            {
-              chatType: THREAD_CHAT_TYPES.CHAT
-            },
-            {
-              participants: {$in: [senderId, recipientId]}
-            }
-          ]
-        })
-        if (foundThread) res(foundThread._id);
-  
-        // else
-        const newThread = await Thread.create({
-          participants: [senderId, recipientId],
-          chatType: THREAD_CHAT_TYPES.CHAT
-        })
-        res(newThread._id);
-    
-      }
+    const retrievedThreadId = await Thread.findOrCreateThreadId({
+      threadId,
+      participants: [senderId, recipientId],
+      chatType: THREAD_CHAT_TYPES.CHAT
     })
 
     const message = await this.create({
@@ -190,7 +168,6 @@ MessageSchema.static('createTextMessage', async function createTextMessage(
       text,
       threadIds: retrievedThreadId
     })
-    await message.save();
     return message;
 
   } catch (err) {
