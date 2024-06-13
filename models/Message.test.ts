@@ -68,10 +68,11 @@ describe("A message", function(){
   test("can be retrieved", async function() {
     const foundMessages = await Message.find(newMessageDetails);
     expect(foundMessages.length).toBe(1);
-    const newMessage = foundMessages[0];
+    const newMessage: IMessage = foundMessages[0];
+    const indexableNewMessage = newMessage as {[index: string]: any}
     for (let [key, val] of Object.entries(newMessageDetails)) {
-      expect(newMessage).toHaveProperty(key);
-      expect(newMessage[key]).toStrictEqual(val);
+      expect(indexableNewMessage).toHaveProperty(key);
+      expect(indexableNewMessage[key] ).toStrictEqual(val);
     }
   })
 
