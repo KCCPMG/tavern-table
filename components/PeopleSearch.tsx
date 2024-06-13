@@ -21,7 +21,20 @@ function MessageModal({personId, username}: MessageModalProps) {
   async function sendMessage(e: FormEvent): Promise<void> {
     e.preventDefault();
     console.log(personId, username, messageText);
+
+    const request = fetch("/api/messages", {
+      method: "POST",
+      body: JSON.stringify({
+        recipientId: personId,
+        text: messageText
+      })
+    })
+
     setShowModal(false);
+    const response = await request;
+    const json = await response.json();
+    console.log(json);
+
   }
 
   return (
