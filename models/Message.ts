@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-import { MESSAGE_TYPE_ARR, RESPONSE_MESSAGE_TYPE_ARR } from "./constants";
+import Thread from "./Thread";
+import { MESSAGE_TYPE_ARR, RESPONSE_MESSAGE_TYPE_ARR, THREAD_CHAT_TYPES } from "./constants";
 
 
 /* Interface and Schema Declarations */
@@ -138,12 +139,54 @@ MessageSchema.static('getIReactMessage', async function getIReactMessage(id): Pr
   return message.toIReactMessage();
 })
 
-// Create and send a regular text message
-MessageSchema.static('createTextMessage', async function createTextMessage(senderId, recipientId, text): Promise<IMessage> {
+
+type createTextMessageObj = {
+  senderId: string, 
+  recipientId: string, 
+  text: string, 
+  threadId?: string
+}
+
+// Create and send a regular text message from one user to another
+MessageSchema.static('createTextMessage', async function createTextMessage(
+  {senderId, recipientId, text, threadId}: createTextMessageObj
+): Promise<IMessage> {
+  // how do I handle a thread? Need to check for one that 
+
+  const retrievedThreadId = await new Promise(async (res, rej) => {
+
+    if (threadId) res(threadId);
+
+    if (!threadId) {
+      // try to find threadId
+      const foundThread = await Thread.findOne({
+        $and: [
+          {
+            chatType: THREAD_CHAT_TYPES.CHAT
+          },
+          {
+            participants: {$in: [senderId, recipientId]}
+          }
+        ]
+      })
+      if (foundThread) res(foundThread._id);
+
+      // else
+      const newThread = await Thread.create({
+        participants: [senderId, recipientId],
+        chatType: THREAD_CHAT_TYPES.CHAT
+      })
+      res(newThread._id);
+  
+    }
+  })
+  
+
   const message = await this.create({
     sender: senderId,
     directRecipient: recipientId,
     text,
+    threadIds: retrievedThreadId
   })
   await message.save();
   return message;
