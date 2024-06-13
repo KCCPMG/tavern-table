@@ -1,7 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, FormEvent} from "react";
 import { useModalContext } from "context/ModalContext";
-import { FormEvent } from "react";
 import { ICampaign } from "@/models/Campaign";
 import Link from "next/link";
 
