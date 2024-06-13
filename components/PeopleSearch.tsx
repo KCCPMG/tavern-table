@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, ChangeEventHandler, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEventHandler, ChangeEvent, FormEvent } from "react";
 import { useModalContext } from "context/ModalContext";
 import { IPerson } from "@/models/User";
 
@@ -12,12 +12,31 @@ type MessageModalProps = {
 
 function MessageModal({personId, username}: MessageModalProps) {
   const { setShowModal } = useModalContext();
+  const [ messageText, setMessageText] = useState("");
+
+  async function handleTextareaChange(e: ChangeEvent<HTMLTextAreaElement>) {
+    setMessageText(e.target.value);
+  }
+
+  async function sendMessage(e: FormEvent): Promise<void> {
+    e.preventDefault();
+    console.log(personId, username, messageText);
+    setShowModal(false);
+  }
 
   return (
-    <form>
-      <textarea rows={4} />
-      <button onClick={(e) => setShowModal(false)}>Cancel</button>
-      <button>Send Message</button>
+    <form onSubmit={sendMessage}>
+      <textarea 
+        className="border" 
+        placeholder="Message" 
+        value={messageText}
+        onChange={handleTextareaChange}
+        rows={4} 
+      />
+      <div>
+        <button onClick={(e) => setShowModal(false)}>Cancel</button>
+        <button type="submit">Send Message</button>
+      </div>
     </form>
   )
 }
@@ -67,8 +86,8 @@ export default function PeopleSearch() {
         {foundPersons.map(fp => {
           return (
             <li key={fp._id}>
-              <div>
-                <h4>fp.username</h4>
+              <div className="border">
+                <h4>{fp.username}</h4>
                 <button 
                   onClick={(e) => {handleSendMessageButtonClick(fp._id, fp.username)}}
                 >
