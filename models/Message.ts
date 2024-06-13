@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import Thread from "./Thread";
-import { MESSAGE_TYPE_ARR, RESPONSE_MESSAGE_TYPE_ARR, THREAD_CHAT_TYPES } from "./constants";
+import { MESSAGE_TYPES, MESSAGE_TYPE_ARR, RESPONSE_MESSAGE_TYPE_ARR, THREAD_CHAT_TYPES } from "./constants";
 
 
 /* Interface and Schema Declarations */
@@ -29,7 +29,9 @@ export interface IMessageMethods {
 
 // create a new model that knows about IMessageMethods, declare static methods
 export interface MessageModel extends mongoose.Model<IMessage, {}, IMessageMethods> {
-
+  createTextMessage(
+    {senderId, recipientId, text, threadId}: createTextMessageObj
+  ): Promise<IMessage>
 }
 
 const MessageSchema = new mongoose.Schema({
@@ -151,45 +153,51 @@ type createTextMessageObj = {
 MessageSchema.static('createTextMessage', async function createTextMessage(
   {senderId, recipientId, text, threadId}: createTextMessageObj
 ): Promise<IMessage> {
-  // how do I handle a thread? Need to check for one that 
 
-  const retrievedThreadId = await new Promise(async (res, rej) => {
-
-    if (threadId) res(threadId);
-
-    if (!threadId) {
-      // try to find threadId
-      const foundThread = await Thread.findOne({
-        $and: [
-          {
-            chatType: THREAD_CHAT_TYPES.CHAT
-          },
-          {
-            participants: {$in: [senderId, recipientId]}
-          }
-        ]
-      })
-      if (foundThread) res(foundThread._id);
-
-      // else
-      const newThread = await Thread.create({
-        participants: [senderId, recipientId],
-        chatType: THREAD_CHAT_TYPES.CHAT
-      })
-      res(newThread._id);
+  try {
+    const retrievedThreadId = await new Promise(async (res, rej) => {
   
-    }
-  })
+      if (threadId) res(threadId);
   
+      if (!threadId) {
+        // try to find threadId
+        const foundThread = await Thread.findOne({
+          $and: [
+            {
+              chatType: THREAD_CHAT_TYPES.CHAT
+            },
+            {
+              participants: {$in: [senderId, recipientId]}
+            }
+          ]
+        })
+        if (foundThread) res(foundThread._id);
+  
+        // else
+        const newThread = await Thread.create({
+          participants: [senderId, recipientId],
+          chatType: THREAD_CHAT_TYPES.CHAT
+        })
+        res(newThread._id);
+    
+      }
+    })
 
-  const message = await this.create({
-    sender: senderId,
-    directRecipient: recipientId,
-    text,
-    threadIds: retrievedThreadId
-  })
-  await message.save();
-  return message;
+    const message = await this.create({
+      sender: senderId,
+      directRecipient: recipientId,
+      messageType: MESSAGE_TYPES.TEXT_ONLY,
+      text,
+      threadIds: retrievedThreadId
+    })
+    await message.save();
+    return message;
+
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+
 })
 
 
