@@ -12,6 +12,9 @@ function LoggedInPanel() {
       <Link className="text-white text-2xl px-2" href="/campaigns">
         Campaigns
       </Link>
+      <Link className="text-white text-2xl px-2" href="/messages">
+        Messages
+      </Link>
       <Link className="text-white text-2xl px-2" href={"/"} onClick={(e) => {
         e.preventDefault();
         signOut();
