@@ -16,6 +16,7 @@ export class NextError extends Error {
 // 400
 export const UsernameTakenErr: NextError = new NextError("A user already exists with that username", 400);
 export const EmailTakenErr: NextError = new NextError("A user already exists with that email", 400);
+export const InvalidMessageErr: NextError = new NextError("Invalid message", 400);
 
 // 401
 export const InvalidPasswordErr: NextError = new NextError("Invalid Password", 401);

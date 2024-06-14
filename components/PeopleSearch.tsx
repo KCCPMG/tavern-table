@@ -3,6 +3,7 @@
 import { useState, useEffect, ChangeEventHandler, ChangeEvent, FormEvent } from "react";
 import { useModalContext } from "context/ModalContext";
 import { IPerson } from "@/models/User";
+import { MESSAGE_TYPES } from "@/models/constants";
 
 
 type MessageModalProps = {
@@ -25,6 +26,7 @@ function MessageModal({personId, username}: MessageModalProps) {
     const request = fetch("/api/messages", {
       method: "POST",
       body: JSON.stringify({
+        chatType: MESSAGE_TYPES.TEXT_ONLY,
         recipientId: personId,
         text: messageText
       })
