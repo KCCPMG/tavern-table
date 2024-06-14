@@ -24,14 +24,15 @@ export interface IMessage {
 
 // instance methods
 export interface IMessageMethods {
-  // stub
+  toIReactMessage(): IReactMessage
 }
 
 // create a new model that knows about IMessageMethods, declare static methods
 export interface MessageModel extends mongoose.Model<IMessage, {}, IMessageMethods> {
   createTextMessage(
     {senderId, recipientId, text, threadId}: createTextMessageObj
-  ): Promise<IMessage>
+  ): Promise<IMessage>,
+  getIReactMessage(id: string): Promise<IReactMessage>,
 }
 
 const MessageSchema = new mongoose.Schema({
@@ -136,7 +137,7 @@ MessageSchema.method('toIReactMessage', function toIReactMessage(): IReactMessag
 /* Static Methods */
 
 // Retrieve a message as an IReactMessage
-MessageSchema.static('getIReactMessage', async function getIReactMessage(id): Promise<IReactMessage> {
+MessageSchema.static('getIReactMessage', async function getIReactMessage(id: string): Promise<IReactMessage> {
   const message = await this.findById(id);
   return message.toIReactMessage();
 })
