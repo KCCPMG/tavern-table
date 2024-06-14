@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { UserNotFoundErr, InvalidMessageErr } from "@/lib/NextError";
 import { MESSAGE_TYPES, MESSAGE_TYPE_ARR } from "@/models/constants";
+import Thread from "@/models/Thread";
 
 
 
@@ -35,18 +36,28 @@ export async function POST(req: NextRequest, res: NextResponse) {
           threadId: threadId || undefined
         });
         return Response.json(message);
-
-      
-        
-      
+ 
     }
-
-
-    
-
 
   } catch (err) {
     console.log(err);
     return handleErrorResponse(err);
   }
+}
+
+
+export async function GET(req: NextRequest, res: NextResponse) {
+  await mongooseConnect();
+  const serverSession = await getServerSession(authOptions);
+
+  if (!(serverSession?.user)) throw UserNotFoundErr;
+  if (!(serverSession.user?._id)) throw UserNotFoundErr;
+
+
+
+
+  const initThreads = await Thread.getThreadPreviewsFor(serverSession.user._id);
+  // const initThreads = await Thread.getThreadsFor(serverSession.user._id);
+
+  return Response.json(initThreads);
 }
