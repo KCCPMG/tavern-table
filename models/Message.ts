@@ -126,7 +126,7 @@ MessageSchema.method('toIReactMessage', function toIReactMessage(): IReactMessag
     messageType: this.messageType,
     text: this.text || undefined,
     response: this.response ? {
-      messageId: this.response.messageId!.toString(),
+      messageId: this.response.messageId ? this.response.messageId.toString() : "",
       messageType: this.response.messageType as MessageType
     } : undefined,
     readBy: this.readBy.map(r => r.toString())
