@@ -166,7 +166,8 @@ MessageSchema.static('createTextMessage', async function createTextMessage(
       directRecipient: recipientId,
       messageType: MESSAGE_TYPES.TEXT_ONLY,
       text,
-      threadIds: retrievedThreadId
+      threadIds: retrievedThreadId,
+      readBy: [senderId]
     })
     return message;
 
