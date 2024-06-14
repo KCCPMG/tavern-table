@@ -54,7 +54,7 @@ const MessageSchema = new mongoose.Schema({
   sendTime: {
     type: Date,
     required: true,
-    default: new Date()
+    default: Date.now
   },
   messageType: {
     required: true,
