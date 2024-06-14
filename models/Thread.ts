@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { THREAD_CHAT_TYPES, ChatTypes } from './constants';
+import Message, { IReactMessage } from './Message';
 
 const THREAD_CHAT_TYPES_ARRAY = Object.values(THREAD_CHAT_TYPES);
 
@@ -22,7 +23,9 @@ export interface IThreadMethods {
 
 // create a new model that incorporates IThreadMethods, declare static methods
 export interface ThreadModel extends mongoose.Model<IThread, {}, IThreadMethods> {
-  findOrCreateThreadId({ threadId, participants, chatType }: findOrCreateThreadIdObj ): Promise<IThread>
+  findOrCreateThreadId({ threadId, participants, chatType }: findOrCreateThreadIdObj ): Promise<IThread>,
+  getThreadsFor(userId: string): Promise<IThread>,
+  getThreadPreviewsFor(userId: string): Promise<Array<IReactThread>>
 }
 
 // main schema
@@ -55,6 +58,13 @@ export type RequiredThreadValues = {
   participants: Array<mongoose.Types.ObjectId>
 }
 
+export type IReactThread = {
+  threadId: string,
+  name: string,
+  participants: Array<string>,
+  messages: Array<IReactMessage>
+}
+
 
 /* Instance Methods */
 
@@ -78,7 +88,8 @@ ThreadSchema.static('findOrCreateThreadId', async function findOrCreateThread(
     const foundThread = await this.findOne({
       $and: [
         { chatType: chatType },
-        { participants: { $in: participants } }
+        { participants: { $all: participants } } 
+        // need to delete prior threads
       ]
     })
     
@@ -96,6 +107,72 @@ ThreadSchema.static('findOrCreateThreadId', async function findOrCreateThread(
   }
 })
 
+
+ThreadSchema.static('getThreadsFor', async function getThreadsFor(userId: string): Promise<IThread> {
+  // const threads = await this.find({participants: {$in : [userId] }})
+  const threads = await this.find({participants: userId})
+  return threads;
+})
+
+
+
+
+ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(userId: string): Promise<Array<IReactThread>> {
+  // get threads
+  const threads: Array<IThread> = await this.find({participants: {$in : userId }})
+  // get messages
+
+  console.log({threads});
+  
+
+  const loadedThreads = await Promise.all(
+    threads.map(thread => {
+      return (Message.find({ threadIds: thread._id})
+      .sort({ sendTime: -1 })
+      .limit(1)
+      .exec()
+      .then(messages => {
+        return {
+          threadId: thread._id.toString(),
+          name: thread.name || "placeholder",
+          participants: thread.participants.map(p => p.toString()),
+          messages: messages.map(m => m.toIReactMessage())
+        }
+      }))
+
+      // .then(message: IMessage => {
+      //   const reactMessage = message.toIReactMessage();
+      // })
+    })
+  );
+
+  console.log(loadedThreads);
+
+  return loadedThreads;
+
+  // How do I write a mongoose query where I am looking for the latest Message document to have in its threadIds array the id of a Thread document, for all Threads which include a particular userId in its participants array?
+
+  // await Message.find({threadIds: 
+  //   {$in: this.find({participants: {$in : userId }})
+  // })
+
+  // the last message in each thread in which this user is a participant
+  // userId is in thread participants
+
+  // return {
+  //   threadId: "string",
+  //   name: "string",
+  //   participants: ["string"],
+  //   messages: [await Message.getIReactMessage('asdfgdhgfsfgasd')]
+  // }
+
+  // export type IReactThread = {
+  //   threadId: string,
+  //   name: string,
+  //   participants: Array<string>,
+  //   messages: Array<IReactMessage>
+  // }
+})
 
 
 export default mongoose.models.Thread as ThreadModel || mongoose.model<IThread, ThreadModel>("Thread", ThreadSchema)
