@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
-import { THREAD_CHAT_TYPES, ChatTypes } from './constants';
+import User from './User';
+import { MESSAGE_TYPE_ARR, THREAD_CHAT_TYPES, ChatTypes } from './constants';
 import Message, { IReactMessage } from './Message';
+import { IPerson } from './User';
 
 const THREAD_CHAT_TYPES_ARRAY = Object.values(THREAD_CHAT_TYPES);
 
@@ -28,12 +30,31 @@ export interface ThreadModel extends mongoose.Model<IThread, {}, IThreadMethods>
   getThreadPreviewsFor(userId: string): Promise<Array<IReactThread>>
 }
 
+type Participant = IPerson & {
+  lastRead: Date,
+}
+
+export type MessageType = typeof MESSAGE_TYPE_ARR[number];
+
+interface IMessage {
+  _id: mongoose.Types.ObjectId,
+  sender: mongoose.Types.ObjectId,
+  threadIds: Array<mongoose.Types.ObjectId>,
+  sendTime: Date,
+  messageType: MessageType,
+  text?: string,
+  response?: {
+    messageId: mongoose.Types.ObjectId,
+    messageType: MessageType
+  }
+}
+
 // main schema
 const ThreadSchema = new mongoose.Schema({
-  participants: {
-    required: true,
-    type: [mongoose.Types.ObjectId]
-  },
+  participants: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: User.modelName
+  }],
   chatType: {
     type: String,
     required: true,
@@ -49,6 +70,18 @@ const ThreadSchema = new mongoose.Schema({
   }
 })
 
+
+ThreadSchema.virtual('messages', {
+  ref: "Message",
+  localField: "_id",
+  foreignField: "threadIds"
+})
+
+ThreadSchema.set('toJSON', {virtuals: true});
+ThreadSchema.set('toObject', {virtuals: true});
+
+
+ThreadSchema.virtual('part')
 
 /* Supporting Types and Values */
 

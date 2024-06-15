@@ -2,6 +2,8 @@ import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
 import Thread, { IThread, RequiredThreadValues } from "./Thread";
 import { THREAD_CHAT_TYPES } from "./constants";
+import fs from "fs";
+import User from './User';
 
 
 const { CHAT, ROOM, CAMPAIGN } = THREAD_CHAT_TYPES;
@@ -29,6 +31,19 @@ beforeAll(async function() {
 
 afterAll(async function() {
   await Thread.deleteMany({name: "test"})
+  
+  const threads = await Thread.find()
+  .populate({
+    path: 'messages',
+    select: 'sender participants text'
+  })
+  .populate({
+    path: 'participants',
+    select: 'username email'
+  });
+  console.log(threads);
+  const handle = fs.openSync('threads.txt', 'w')
+  fs.writeFileSync(handle, JSON.stringify(threads, null, 2))
   await mongoose.disconnect();
 })
 
