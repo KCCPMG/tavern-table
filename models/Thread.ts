@@ -115,9 +115,49 @@ ThreadSchema.static('getThreadsFor', async function getThreadsFor(userId: string
 })
 
 
-
-
 ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(userId: string): Promise<Array<IReactThread>> {
+
+  console.log("updated");
+
+  const uId = new mongoose.Types.ObjectId(userId);
+
+  const agg = await this.aggregate([
+    { $match: { participants: uId } },
+    { $unwind: "$participants" },
+    { $match: { participants: { $ne: uId } } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "participants",
+        foreignField: "_id",
+        as: "participantUser"
+      }
+    },
+    { $unwind: "$participantUser" },
+    {
+      $lookup: {
+        from: "messages",
+        let: { threadId: "$_id" },
+        pipeline: [
+          { $match: { $expr: { $in: ["$$threadId", "$threadIds"] } } },
+          { $sort: { sendTime: -1 } },
+          { $limit: 1 },
+          { $project: { text: 1, sendTime: 1, _id: 0 } }
+        ],
+        as: "latestMessage"
+      }
+    },
+    { $sort: { "latestMessage.sendTime": -1 } },
+    { $project: { _id: 1, latestMessage: 1 } }
+  ]);
+
+  console.log(agg);
+  return(agg);
+});
+
+
+
+ThreadSchema.static('SPIKEgetThreadPreviewsFor', async function SPIKEgetThreadPreviewsFor(userId: string): Promise<Array<IReactThread>> {
   // get threads
   const threads: Array<IThread> = await this.find({participants: {$in : userId }})
   // get messages
@@ -136,17 +176,21 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
           threadId: thread._id.toString(),
           name: thread.name || "placeholder",
           participants: thread.participants.map(p => p.toString()),
-          messages: messages.map(m => m.toIReactMessage())
+          // messages: messages.map(m => m.toIReactMessage())
+          messages
         }
       }))
 
-      // .then(message: IMessage => {
-      //   const reactMessage = message.toIReactMessage();
-      // })
     })
   );
 
-  console.log(loadedThreads);
+  loadedThreads.sort((a,b) => {
+    return (a.messages[0].sendTime.valueOf() || 0) - (b.messages[0].sendTime.valueOf() || 0)
+  })
+
+  loadedThreads.forEach(lt => lt.messages.forEach(m => m.toIReactMessage()));
+
+  console.log(JSON.stringify(loadedThreads));
 
   return loadedThreads;
 
