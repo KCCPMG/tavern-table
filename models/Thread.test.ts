@@ -1,9 +1,9 @@
 import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
+import User from './User';
 import Thread, { IThread, RequiredThreadValues } from "./Thread";
 import { THREAD_CHAT_TYPES } from "./constants";
 import fs from "fs";
-import User from './User';
 
 
 const { CHAT, ROOM, CAMPAIGN } = THREAD_CHAT_TYPES;
