@@ -53,7 +53,7 @@ interface IMessage {
 const ThreadSchema = new mongoose.Schema({
   participants: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: User?.modelName || "User"
+    ref: "User"
   }],
   chatType: {
     type: String,
@@ -72,7 +72,7 @@ const ThreadSchema = new mongoose.Schema({
 
 
 ThreadSchema.virtual('messages', {
-  ref: Message?.modelName || "Message",
+  ref: "Message",
   localField: "_id",
   foreignField: "threadIds"
 })
@@ -160,7 +160,26 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
   });
 
 
-  return threads;
+  [1,2,3,4].map(num => {
+    return num;
+  })
+
+  const sanitizedThreads = threads.map(t => {
+
+    const otherParticipant = t.participants.filter(part => part._id.toString() != userId)[0];
+
+    return {
+      userId,
+      threadId: t._id,
+      name: t.name ? t.name : otherParticipant.username,
+      otherParticipant,
+      // imageUrl: otherParticipant.imageUrl,
+      participants: t.participants,
+      messages: t.messages
+    }
+  })
+
+  return sanitizedThreads;
 
 })
 
