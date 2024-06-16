@@ -1,5 +1,6 @@
 import Campaign from "@/models/Campaign";
 import User from "@/models/User";
+import { createCampaign } from "@/models/Controls";
 import { NextRequest, NextResponse } from "next/server";
 
 import { getServerSession } from "next-auth";
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const { createObj } = await req.json();
     // console.log({createObj});
-    await Campaign.createCampaign({
+    await createCampaign({
       ...createObj,
       creatorId: serverSession?.user._id
     });

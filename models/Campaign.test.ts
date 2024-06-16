@@ -5,6 +5,7 @@ import Thread, { IThread } from "./Thread";
 import Campaign, { ICampaign } from "./Campaign";
 import { THREAD_CHAT_TYPES } from "./constants";
 import { sampleUser1Details, sampleCampaignDetails } from "./test_resources/sampleDocs";
+import { createCampaign } from "./Controls";
 
 
 const newThreadDetails = {
@@ -18,7 +19,7 @@ beforeAll(async function() {
     User.deleteMany({username: sampleUser1Details.username}),
     Thread.deleteMany(newThreadDetails)
   ]);
-  const [newUser, newThread]: Array<IUser> = await Promise.all([ 
+  const [newUser, newThread] = await Promise.all([ 
     User.register(sampleUser1Details),
     Thread.create(newThreadDetails)
   ]);
@@ -75,14 +76,14 @@ describe("A campaign", function() {
   })
 
 
-  test("can be created with the static createCampaign method", async function() {
+  test("can be created with the Controls - createCampaign method", async function() {
 
     // create user, check correct initializiation
     const sampleUser = await User.findOne({email: sampleUser1Details.email}) as IUser;
     expect(sampleUser).not.toBe(null);
 
     // create campaign
-    const newCampaign: {[index: string]: any} = await Campaign.createCampaign({
+    const newCampaign: {[index: string]: any} = await createCampaign({
       creatorId: sampleUser._id,
       name: sampleCampaignDetails.name
     });
