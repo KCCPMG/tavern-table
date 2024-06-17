@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { MESSAGE_TYPE_ARR, THREAD_CHAT_TYPES, ChatTypes } from './constants';
-import Message, { IReactMessage } from './Message';
+import Message, { IMessage, IMessageMethods, IReactMessage, MessageModel } from './Message';
 import User, { IPerson } from './User';
 import mongooseConnect from '@/lib/mongooseConnect';
 
@@ -12,7 +12,10 @@ const THREAD_CHAT_TYPES_ARRAY = Object.values(THREAD_CHAT_TYPES);
 // basic interface
 export interface IThread {
   _id: mongoose.Types.ObjectId,
-  participants: Array<mongoose.Types.ObjectId>,
+  participants: [{
+    lastRead: Date,
+    user: mongoose.Types.ObjectId
+  }],
   chatType: typeof THREAD_CHAT_TYPES_ARRAY[number],
   campaignId?: mongoose.Types.ObjectId,
   name?: string
@@ -30,30 +33,22 @@ export interface ThreadModel extends mongoose.Model<IThread, {}, IThreadMethods>
   getThreadPreviewsFor(userId: string): Promise<Array<IReactThread>>
 }
 
-type Participant = IPerson & {
-  lastRead: Date,
-}
 
 export type MessageType = typeof MESSAGE_TYPE_ARR[number];
 
-interface IMessage {
-  _id: mongoose.Types.ObjectId,
-  sender: mongoose.Types.ObjectId,
-  threadIds: Array<mongoose.Types.ObjectId>,
-  sendTime: Date,
-  messageType: MessageType,
-  text?: string,
-  response?: {
-    messageId: mongoose.Types.ObjectId,
-    messageType: MessageType
-  }
-}
 
 // main schema
 const ThreadSchema = new mongoose.Schema({
   participants: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
+    _id: false,
+    lastRead: {
+      type: Date,
+      default: null
+    },
+    user: {
+      type: mongoose.Types.ObjectId,
+      ref: "User"
+    }
   }],
   chatType: {
     type: String,
@@ -93,8 +88,19 @@ export type RequiredThreadValues = {
 export type IReactThread = {
   threadId: string,
   name: string,
-  participants: Array<string>,
+  participants: Array<IPerson>,
   messages: Array<IReactMessage>
+}
+
+// Use 'Omit' to override 'participants' key from IThread interface
+export type IPopulatedThread = Omit<IThread, 'participants'> & {
+  participants: [{
+    _id: mongoose.Types.ObjectId,
+    username: string,
+    email: string,
+    imageUrl: string 
+  }],
+  messages: [IMessage & IMessageMethods]
 }
 
 
@@ -149,24 +155,25 @@ ThreadSchema.static('getThreadsFor', async function getThreadsFor(userId: string
 
 ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(userId: string): Promise<Array<IReactThread>> {
   await mongooseConnect();
-  const threads = await this.find({participants: userId})
+
+  console.log(userId);
+
+  const threads: IPopulatedThread[] = await this.find({participants: {user: userId}})
   .populate({
     path: 'messages',
     select: 'sender sendTime chatType participants text'
   })
   .populate({
-    path: 'participants',
+    path: 'participants.user',
     select: 'username email imageUrl'
   });
 
 
-  [1,2,3,4].map(num => {
-    return num;
-  })
 
   const sanitizedThreads = threads.map(t => {
 
-    const otherParticipant = t.participants.filter(part => part._id.toString() != userId)[0];
+    const otherParticipants = t.participants.filter(part => part._id.toString() != userId);
+    const otherParticipant = otherParticipants[0];
 
     return {
       userId,
@@ -174,8 +181,30 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
       name: t.name ? t.name : otherParticipant.username,
       otherParticipant,
       // imageUrl: otherParticipant.imageUrl,
-      participants: t.participants,
-      messages: t.messages
+      participants: t.participants.map(participant => {
+        return {
+          _id: participant._id.toString(),
+          username: participant.username,
+          email: participant.email,
+          imageUrl: participant.imageUrl
+        }
+      }),
+      messages: t.messages.map(message => {
+        return {
+          _id: message._id.toString(),
+          sender: message.sender.toString(),
+          campaignId: message.campaignId?.toString() || null,
+          directRecipient: message.directRecipient?.toString() || null,
+          threadIds: message.threadIds.map(tId => tId.toString()),
+          sendTime: message.sendTime,
+          messageType: message.messageType,
+          text: message.text,
+          response: message.response ? {
+            messageId: message.response.messageId,
+            messageType: message.response.messageType
+          } : null
+        }
+      })
     }
   })
 

@@ -18,8 +18,7 @@ export interface IMessage {
   response?: {
     messageId: mongoose.Types.ObjectId,
     messageType: MessageType
-  },
-  readBy: Array<mongoose.Types.ObjectId>
+  }
 }
 
 // instance methods
@@ -76,9 +75,6 @@ const MessageSchema = new mongoose.Schema({
       type: String,
       enum: RESPONSE_MESSAGE_TYPE_ARR
     }
-  },
-  readBy: {
-    type: [mongoose.Types.ObjectId]
   }
 })
 
@@ -97,8 +93,7 @@ export type IReactMessage = {
   response?: {
     messageId: string,
     messageType: MessageType
-  },
-  readBy: Array<string>
+  }
 }
 
 export type MessageType = typeof MESSAGE_TYPE_ARR[number];
@@ -128,8 +123,7 @@ MessageSchema.method('toIReactMessage', function toIReactMessage(): IReactMessag
     response: this.response ? {
       messageId: this.response.messageId ? this.response.messageId.toString() : "",
       messageType: this.response.messageType as MessageType
-    } : undefined,
-    readBy: this.readBy.map(r => r.toString())
+    } : undefined
   }
 })
 
@@ -167,8 +161,7 @@ MessageSchema.static('createTextMessage', async function createTextMessage(
       directRecipient: recipientId,
       messageType: MESSAGE_TYPES.TEXT_ONLY,
       text,
-      threadIds: retrievedThreadId,
-      readBy: [senderId]
+      threadIds: retrievedThreadId
     })
     return message;
 
