@@ -38,7 +38,7 @@ export type MessageType = typeof MESSAGE_TYPE_ARR[number];
 
 
 // main schema
-const ThreadSchema = new mongoose.Schema({
+const ThreadSchema = new mongoose.Schema<IThread, ThreadModel, IThreadMethods>({
   participants: [{
     _id: false,
     lastRead: {
@@ -95,6 +95,7 @@ export type IReactThread = {
 // Use 'Omit' to override 'participants' key from IThread interface
 export type IPopulatedThread = Omit<IThread, 'participants'> & {
   participants: [{
+    lastRead: Date,
     _id: mongoose.Types.ObjectId,
     username: string,
     email: string,
@@ -126,18 +127,23 @@ ThreadSchema.static('findOrCreateThreadId', async function findOrCreateThread(
     const foundThread = await this.findOne({
       $and: [
         { chatType: chatType },
-        { participants: { $all: participants } } 
+        { 'participants.user' : { $all: participants } } 
         // need to delete prior threads
       ]
     })
     
-    if (foundThread) return (foundThread._id);
+    if (foundThread) return (foundThread._id.toString());
     // else
+
+    const participantArr = participants.map(participant => {
+      return ({user: participant});
+    })
+
     const newThread = await this.create({
-      participants,
+      participants: participantArr,
       chatType: THREAD_CHAT_TYPES.CHAT
     })
-    return newThread._id;
+    return newThread._id.toString();
 
   } catch(err) {
     console.log(err);
@@ -146,7 +152,7 @@ ThreadSchema.static('findOrCreateThreadId', async function findOrCreateThread(
 })
 
 
-ThreadSchema.static('getThreadsFor', async function getThreadsFor(userId: string): Promise<IThread> {
+ThreadSchema.static('getThreadsFor', async function getThreadsFor(userId: string): Promise<Array<IThread>> {
   // const threads = await this.find({participants: {$in : [userId] }})
   const threads = await this.find({participants: userId})
   return threads;
@@ -177,7 +183,7 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
 
     return {
       userId,
-      threadId: t._id,
+      threadId: t._id.toString(),
       name: t.name ? t.name : otherParticipant.username,
       otherParticipant,
       // imageUrl: otherParticipant.imageUrl,
@@ -190,20 +196,36 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
         }
       }),
       messages: t.messages.map(message => {
-        return {
+        // convert necessary fields
+        const sanitizedMessage: IReactMessage =  {
           _id: message._id.toString(),
           sender: message.sender.toString(),
-          campaignId: message.campaignId?.toString() || null,
-          directRecipient: message.directRecipient?.toString() || null,
+          // directRecipient: message.directRecipient?.toString() || undefined,
+          // campaignId: message.campaignId?.toString() || undefined,
           threadIds: message.threadIds.map(tId => tId.toString()),
           sendTime: message.sendTime,
           messageType: message.messageType,
           text: message.text,
-          response: message.response ? {
-            messageId: message.response.messageId,
-            messageType: message.response.messageType
-          } : null
+          // response: message.response ? {
+          //   messageId: message.response.messageId,
+          //   messageType: message.response.messageType
+          // } : undefined
         }
+        // convert optional fields
+        if (message.directRecipient) {
+          sanitizedMessage.directRecipient = message.directRecipient.toString()
+        }
+        if (message.campaignId) {
+          sanitizedMessage.directRecipient = message.campaignId.toString()
+        }
+        if (message.response) {
+          sanitizedMessage.response = {
+            messageId: message.response.messageId.toString(),
+            messageType: message.response.messageType
+          }
+        }
+
+        return sanitizedMessage;
       })
     }
   })
