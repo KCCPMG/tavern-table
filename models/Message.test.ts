@@ -58,7 +58,16 @@ describe("A message", function(){
     testStorage.firstUserId = firstUser._id.toString();
     testStorage.secondUserId = secondUser._id.toString();
 
-    newThreadDetails.participants = [firstUser._id, secondUser._id];
+    newThreadDetails.participants = [
+      {
+        lastRead: null,
+        user: firstUser._id,
+      },
+      {
+        lastRead: null,
+        user: secondUser._id
+      } 
+    ];
     newMessageDetails.sender = firstUser._id;
     const newThread = await Thread.create(newThreadDetails);
     testStorage.threadId = newThread._id.toString();
@@ -109,8 +118,6 @@ describe("A message", function(){
     expect(message.threadIds.length).toBe(1);
     expect(message.threadIds[0]!.toString()).toBe(testStorage.threadId);
     expect(message.text).toBe("hello");
-    expect(message.readBy.length).toBe(1);
-    expect(message.readBy[0].toString()).toBe(testStorage.firstUserId);
   })
 
   test("can be created with createTextMessage method without provided thread", async function() {
@@ -125,8 +132,6 @@ describe("A message", function(){
     expect(message.threadIds.length).toBe(1);
     expect(message.threadIds[0]!.toString()).toBe(testStorage.threadId);
     expect(message.text).toBe("hello, this is my next message");
-    expect(message.readBy.length).toBe(1);
-    expect(message.readBy[0].toString()).toBe(testStorage.firstUserId);
   })
 
   test("can be created with createTextMessage method without provided or existent thread", async function() {
@@ -146,8 +151,6 @@ describe("A message", function(){
     expect(message.threadIds.length).toBe(1);
     expect(message.threadIds[0]!.toString()).not.toBe(testStorage.threadId);
     expect(message.text).toBe("hello, this is my next message");
-    expect(message.readBy.length).toBe(1);
-    expect(message.readBy[0].toString()).toBe(testStorage.firstUserId);
   })
 
 })

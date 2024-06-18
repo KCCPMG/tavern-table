@@ -23,7 +23,10 @@ export async function createCampaign(createObj : CreateCampaignProps) : Promise<
       Thread.create({
         name,
         chatType: THREAD_CHAT_TYPES.CAMPAIGN,
-        participants: [creatorId]
+        participants: [{
+          lastRead: null,
+          user: creatorId
+        }]
       })
     ]);
     const campaign = await Campaign.create({

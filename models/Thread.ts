@@ -82,7 +82,10 @@ ThreadSchema.set('toObject', {virtuals: true});
 export type RequiredThreadValues = {
   name: string,
   chatType: ChatTypes,
-  participants: Array<mongoose.Types.ObjectId>
+  participants: {
+    lastRead: Date | null,
+    user: mongoose.Types.ObjectId
+  }[]
 }
 
 export type IReactThread = {
@@ -96,10 +99,12 @@ export type IReactThread = {
 export type IPopulatedThread = Omit<IThread, 'participants'> & {
   participants: [{
     lastRead: Date,
-    _id: mongoose.Types.ObjectId,
-    username: string,
-    email: string,
-    imageUrl: string 
+    user : {
+      _id: mongoose.Types.ObjectId,
+      username: string,
+      email: string,
+      imageUrl: string 
+    }
   }],
   messages: [IMessage & IMessageMethods]
 }
@@ -164,7 +169,7 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
 
   console.log(userId);
 
-  const threads: IPopulatedThread[] = await this.find({participants: {user: userId}})
+  const threads: IPopulatedThread[] = await this.find({'participants.user' : userId})
   .populate({
     path: 'messages',
     select: 'sender sendTime chatType participants text'
@@ -174,25 +179,26 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
     select: 'username email imageUrl'
   });
 
+  console.log(JSON.stringify(threads, null, 2));
 
 
   const sanitizedThreads = threads.map(t => {
 
-    const otherParticipants = t.participants.filter(part => part._id.toString() != userId);
+    const otherParticipants = t.participants.filter(part => part.user._id.toString() != userId);
     const otherParticipant = otherParticipants[0];
 
     return {
       userId,
       threadId: t._id.toString(),
-      name: t.name ? t.name : otherParticipant.username,
+      name: t.name ? t.name : otherParticipant.user.username,
       otherParticipant,
       // imageUrl: otherParticipant.imageUrl,
       participants: t.participants.map(participant => {
         return {
-          _id: participant._id.toString(),
-          username: participant.username,
-          email: participant.email,
-          imageUrl: participant.imageUrl
+          _id: participant.user._id.toString(),
+          username: participant.user.username,
+          email: participant.user.email,
+          imageUrl: participant.user.imageUrl
         }
       }),
       messages: t.messages.map(message => {
@@ -218,7 +224,8 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
         if (message.campaignId) {
           sanitizedMessage.directRecipient = message.campaignId.toString()
         }
-        if (message.response) {
+        // message.response is an object, even if undefined will return truthy
+        if (message.response?.messageId) {
           sanitizedMessage.response = {
             messageId: message.response.messageId.toString(),
             messageType: message.response.messageType

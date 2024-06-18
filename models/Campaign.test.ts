@@ -101,7 +101,19 @@ describe("A campaign", function() {
     
     // check thread
     const campaignThread: IThread = await Thread.findOne({_id: newCampaign.threadId}) as IThread;
-    expect(campaignThread.participants).toEqual([sampleUser._id])
+
+    console.log({
+      "sampledUser._id": sampleUser._id,
+      "received Participants": campaignThread.participants
+    })
+    expect(campaignThread.participants instanceof Array).toBe(true);
+    expect(campaignThread.participants).toHaveLength(1);
+    expect(campaignThread.participants[0].lastRead).toBeNull();
+    expect(campaignThread.participants[0].user).toEqual(sampleUser._id);
+    // expect(campaignThread.participants).toEqual([{
+    //   lastRead: null,
+    //   user: sampleUser._id}
+    // ])
     expect(campaignThread.chatType).toBe(THREAD_CHAT_TYPES.CAMPAIGN)
     expect(campaignThread.participants)
 

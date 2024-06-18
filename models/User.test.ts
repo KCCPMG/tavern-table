@@ -1,9 +1,11 @@
 import mongooseConnect from "@/lib/mongooseConnect";
 import mongoose from 'mongoose';
-import User, { IUser, DEFAULT_IMAGES } from "./User";
+import User, { IUser } from "./User";
+import { DEFAULT_IMAGES } from "./constants";
 import { sampleUser1Details } from "./test_resources/sampleDocs";
 import { EmailTakenErr, InvalidPasswordErr, UserNotFoundErr, UsernameTakenErr } from "@/lib/NextError";
-import Campaign, { CreateCampaignProps } from "./Campaign";
+import Campaign from "./Campaign";
+import { createCampaign, CreateCampaignProps } from "./Controls";
 
 
 const createdUserDetails= {  
@@ -126,7 +128,7 @@ describe("A user", function() {
       description: "Sample campaign for test on models/User.test",
       game: "Starfinder",
     }
-    const createdCampaign = await Campaign.createCampaign(campProps);
+    const createdCampaign = await createCampaign(campProps);
     newUser = await User.findById(newUserObj._id);
 
     console.log(createdCampaign);
@@ -163,7 +165,7 @@ describe("A user", function() {
     const person = await User.getPerson(newUserObj!._id as mongoose.Types.ObjectId);
     
     expect(person).toStrictEqual({
-      _id: newUserObj._id,
+      _id: newUserObj._id?.toString(),
       email: sampleUser1Details.email,
       username: sampleUser1Details.username,
       imageUrl: DEFAULT_IMAGES[sampleUser1Details.username[0].toUpperCase()]
