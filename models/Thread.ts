@@ -91,6 +91,7 @@ export type RequiredThreadValues = {
 export type IReactThread = {
   threadId: string,
   name: string,
+  chatType: ChatTypes,
   participants: Array<IPerson>,
   messages: Array<IReactMessage>
 }
@@ -192,6 +193,7 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
       threadId: t._id.toString(),
       name: t.name ? t.name : otherParticipant.user.username,
       otherParticipant,
+      chatType: t.chatType,
       // imageUrl: otherParticipant.imageUrl,
       participants: t.participants.map(participant => {
         return {
