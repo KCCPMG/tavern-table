@@ -30,6 +30,6 @@ export default async function MessagesPage(req: NextRequest, res: NextResponse) 
 
   return (
     // <div>{JSON.stringify(initThreads)}</div>
-    <ThreadsList initThreads={initThreads}></ThreadsList>
+    <ThreadsList initThreads={initThreads} userId={session.user._id}/>
   )
 }

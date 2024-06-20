@@ -6,14 +6,14 @@ import Link from "next/link";
 
 
 type ThreadsListProps = {
-  initThreads: Array<IReactThread>
+  initThreads: Array<IReactThread>,
+  userId: string
 }
 
 
-export default function ThreadsList({initThreads}: ThreadsListProps) {
+export default function ThreadsList({initThreads, userId}: ThreadsListProps) {
 
-  const {data, status} = useSession();
-  console.log(data);
+
 
   console.log(initThreads);
 
@@ -24,13 +24,13 @@ export default function ThreadsList({initThreads}: ThreadsListProps) {
         const imageUrlArr = []
 
         if (it.chatType === "CHAT") {
-          const otherParticipant = it.participants.filter(pt => pt._id !== data?.user._id)[0];
+          const otherParticipant = it.participants.filter(pt => pt._id !== userId)[0];
           imageUrlArr.push(otherParticipant.imageUrl);
 
         } else if (it.chatType === "CAMPAIGN") {
           // get campaign imageUrl
         } else if (it.chatType === "ROOM") {
-          const otherParticipants = it.participants.filter(pt => pt._id !== data?.user._id);
+          const otherParticipants = it.participants.filter(pt => pt._id !== userId);
           otherParticipants.forEach(op => imageUrlArr.push(op.imageUrl));
         }
 
@@ -41,7 +41,7 @@ export default function ThreadsList({initThreads}: ThreadsListProps) {
           <li key={it.threadId}>
             <Link href={`/threads/${it.threadId}`}>
               <h5>{it.name}</h5>
-              {it.messages[0] && data && 
+              {it.messages[0] && 
                 <>
                   <div>
                     {
