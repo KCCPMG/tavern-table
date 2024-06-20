@@ -177,10 +177,10 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
   })
   .populate({
     path: 'participants.user',
-    select: 'username email imageUrl'
+    select: 'username email imageUrl createTime confirmed'
   });
 
-  console.log(JSON.stringify(threads, null, 2));
+  console.log("threads", JSON.stringify(threads, null, 2));
 
 
   const sanitizedThreads = threads.map(t => {
