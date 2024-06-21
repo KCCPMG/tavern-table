@@ -21,6 +21,8 @@ export const InvalidMessageErr: NextError = new NextError("Invalid message", 400
 
 // 401
 export const InvalidPasswordErr: NextError = new NextError("Invalid Password", 401);
+export const ThreadAccessDeniedErr: NextError = new NextError("You do not have permission to view that thread", 401);
+
 
 // 404
 export const UserNotFoundErr: NextError = new NextError("User not found", 404);
