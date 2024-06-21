@@ -3,6 +3,7 @@ import { MESSAGE_TYPE_ARR, THREAD_CHAT_TYPES, ChatTypes } from './constants';
 import Message, { IMessage, IMessageMethods, IReactMessage, MessageModel } from './Message';
 import User, { IPerson } from './User';
 import mongooseConnect from '@/lib/mongooseConnect';
+import { ThreadNotFoundErr, ThreadAccessDeniedErr } from '@/lib/NextError';
 
 const THREAD_CHAT_TYPES_ARRAY = Object.values(THREAD_CHAT_TYPES);
 
@@ -30,7 +31,8 @@ export interface IThreadMethods {
 export interface ThreadModel extends mongoose.Model<IThread, {}, IThreadMethods> {
   findOrCreateThreadId({ threadId, participants, chatType }: findOrCreateThreadIdObj ): Promise<IThread>,
   getThreadsFor(userId: string): Promise<IThread>,
-  getThreadPreviewsFor(userId: string): Promise<Array<IReactThread>>
+  getThreadPreviewsFor(userId: string): Promise<Array<IReactThread>>,
+  getThread(threadId: string, userId: string): Promise<IReactThread>
 }
 
 
@@ -241,6 +243,82 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
 
   return sanitizedThreads;
 
+})
+
+ThreadSchema.static('getThread', async function getThread(threadId: string, userId: string): Promise<IReactThread> {
+  try {
+    const thread: IPopulatedThread | null = await this.findById(threadId)
+    .populate({
+      path: 'messages',
+      select: 'sender sendTime chatType participants text'
+    })
+    .populate({
+      path: 'participants.user',
+      select: 'username email imageUrl createTime confirmed'
+    });
+
+    if (!thread) throw ThreadNotFoundErr;
+    if (!(thread.participants.map(t => t.user._id.toString()).includes(userId))) throw ThreadAccessDeniedErr;
+
+    const otherParticipants = thread.participants.filter(part => part.user._id.toString() != userId);
+    const otherParticipant = otherParticipants[0];
+  
+    thread.messages.sort((a,b) => {
+      return new Date(a.sendTime).getTime() - new Date(b.sendTime).getTime()
+    });
+
+    return {
+      threadId: thread._id.toString(),
+      name: thread.name ? thread.name : otherParticipant.user.username,
+      chatType: thread.chatType,
+      // imageUrl: otherParticipant.imageUrl,
+      participants: thread.participants.map(participant => {
+        return {
+          _id: participant.user._id.toString(),
+          username: participant.user.username,
+          email: participant.user.email,
+          imageUrl: participant.user.imageUrl
+        }
+      }),
+      messages: thread.messages.map(message => {
+        // convert necessary fields
+        const sanitizedMessage: IReactMessage =  {
+          _id: message._id.toString(),
+          sender: message.sender.toString(),
+          // directRecipient: message.directRecipient?.toString() || undefined,
+          // campaignId: message.campaignId?.toString() || undefined,
+          threadIds: message.threadIds.map(tId => tId.toString()),
+          sendTime: message.sendTime,
+          messageType: message.messageType,
+          text: message.text,
+          // response: message.response ? {
+          //   messageId: message.response.messageId,
+          //   messageType: message.response.messageType
+          // } : undefined
+        }
+        // convert optional fields
+        if (message.directRecipient) {
+          sanitizedMessage.directRecipient = message.directRecipient.toString()
+        }
+        if (message.campaignId) {
+          sanitizedMessage.directRecipient = message.campaignId.toString()
+        }
+        // message.response is an object, even if undefined will return truthy
+        if (message.response?.messageId) {
+          sanitizedMessage.response = {
+            messageId: message.response.messageId.toString(),
+            messageType: message.response.messageType
+          }
+        }
+
+        return sanitizedMessage;
+      })
+    }
+
+
+  } catch(err) {
+    throw err;
+  }
 })
 
 
