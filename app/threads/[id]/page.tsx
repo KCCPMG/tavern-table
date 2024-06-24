@@ -1,9 +1,13 @@
 "use server";
 import Chat from "@/components/Chat";
-import Thread from "@/models/Thread";
+import Thread, { IReactThread } from "@/models/Thread";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/api/auth/[...nextauth]/route";
 import ToastRedirect from "@/components/ToastRedirect";
+import Image from "next/image";
+
+const placeholderImgString = "/sample.jpg";
+
 
 
 type PageProps = {
@@ -13,7 +17,6 @@ type PageProps = {
 }
 
 export default async function Page({params}: PageProps ) {
-
 
   const session = await getServerSession(authOptions);
   console.log({"session.user": session?.user})
@@ -29,11 +32,24 @@ export default async function Page({params}: PageProps ) {
     />
   );
 
-
   const initThread = await Thread.getThread(params.id, session.user._id);
 
+
+
   return (
-    <Chat initThread={initThread} userId={session.user._id}/>
+    <>
+      <span>
+        <Image 
+          src={initThread.imageUrl || placeholderImgString} 
+          alt={initThread.name} 
+          width="150"
+          height="150"
+        />
+        {/* <img src={initThread.imageUrl || placeholderImgString} alt={initThread.name} /> */}
+        <h1>{initThread.name}</h1>
+      </span>
+      <Chat initThread={initThread} userId={session.user._id}/>
+    </>
   )
 
 };
