@@ -38,16 +38,18 @@ export default async function Page({params}: PageProps ) {
 
   return (
     <>
-      <span>
+      <div>
         <Image 
           src={initThread.imageUrl || placeholderImgString} 
           alt={initThread.name} 
-          width="150"
-          height="150"
+          width="100"
+          height="100"
+          className="inline-block"
         />
-        {/* <img src={initThread.imageUrl || placeholderImgString} alt={initThread.name} /> */}
-        <h1>{initThread.name}</h1>
-      </span>
+        <div className="inline-block">
+          <h1>{initThread.name}</h1>
+        </div>
+      </div>
       <Chat initThread={initThread} userId={session.user._id}/>
     </>
   )
