@@ -7,6 +7,7 @@ export interface ICampaign {
   name: string, 
   createdBy: mongoose.Types.ObjectId, 
   createdOn: Date, 
+  imageUrl: string,
   description: string, 
   dm: Array<mongoose.Types.ObjectId>,
   handouts: Array<mongoose.Types.ObjectId>,
@@ -18,19 +19,31 @@ export interface ICampaign {
   threadId: mongoose.Types.ObjectId
 }
 
+// instance methods
+export interface ICampaignMethods {
+  // stub
+}
+
+// create a new model that incorporates ICampaignMethods, declare static methods
+export interface CampaignModel extends mongoose.Model<ICampaign> {
+  getIReactCampaign(campaignId: string): Promise<IReactCampaign>
+}
+
 export type RequiredCampaignValues = {
   name: string,
   threadId: mongoose.Types.ObjectId,
-  createdBy?: mongoose.Types.ObjectId
+  createdBy?: mongoose.Types.ObjectId,
+  imageUrl: string
 }
 
-const CampaignSchema = new mongoose.Schema({
+const CampaignSchema = new mongoose.Schema<ICampaign, CampaignModel, ICampaignMethods>({
   name: {
     type: String,
     required: true
   },
   createdBy: {
-    type: mongoose.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true
   },
   createdOn: {
@@ -38,13 +51,21 @@ const CampaignSchema = new mongoose.Schema({
     default: new Date(),
     required: true
   },
+  imageUrl: {
+    type: String,
+    required: true
+  },
   description: {
     type: String,
     required: false
   },
-  dm: {
-    type: [mongoose.Types.ObjectId]
-  },
+  dm: [{
+    _id: false,
+    user: {
+      type: mongoose.Types.ObjectId,
+      ref: "User"
+    }
+  }],
   handouts: {
     type: [mongoose.Types.ObjectId]
   },
@@ -52,13 +73,20 @@ const CampaignSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  players: {
-    type: [mongoose.Types.ObjectId]
-  },
-  invitedPlayers: {
-    type: [mongoose.Types.ObjectId],
-    default: []
-  },
+  players:  [{
+    _id: false,
+    user: {
+      type: mongoose.Types.ObjectId,
+      ref: "User"
+    }
+  }],
+  invitedPlayers:  [{
+    _id: false,
+    user: {
+      type: mongoose.Types.ObjectId,
+      ref: "User"
+    }
+  }],
   journalEntries: {
     type: [mongoose.Types.ObjectId],
     default: []
@@ -68,16 +96,20 @@ const CampaignSchema = new mongoose.Schema({
     default: []
   },
   threadId: {
-    type: mongoose.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Thread",
     required: true
   }
 })
+
+
 
 export type IReactCampaign = {
   _id: string,
   name: string, 
   createdBy: IPerson, 
   createdOn: Date, 
+  imageUrl: string,
   description: string, 
   dm: Array<IPerson>,
   handouts: Array<string>,
@@ -91,46 +123,63 @@ export type IReactCampaign = {
 
 
 
+export type IPopulatedCampaign = Omit<ICampaign, 'createdBy' | 'dm' | 'players' | 'invitedPlayers'> & {
+  createdBy: IPerson,
+  dm: IPerson[],
+  players: IPerson[],
+  invitedPlayers: IPerson[]
 
-export interface CampaignModel extends mongoose.Model<ICampaign> {
-  getIReactCampaign(campaignId: string): Promise<IReactCampaign>
 }
-
-
 
 CampaignSchema.static('getIReactCampaign', async function getIReactCampaign(campaignId : string) : Promise<IReactCampaign> {
   
-  const [campaign, users] = await Promise.all([
-    this.findById(campaignId),
-    this.findById(campaignId)
-      .then((camp: ICampaign) => {
-        return Promise.all([
-          User.getPerson(camp.createdBy),
-          Promise.all(camp.dm.map(dm => User.getPerson(dm))),
-          Promise.all(camp.dm.map(dm => User.getPerson(dm))),
-          Promise.all(camp.dm.map(dm => User.getPerson(dm)))
-        ])
-      })
-  ]);
+  // const [campaign, users] = await Promise.all([
+  //   this.findById(campaignId),
+  //   this.findById(campaignId)
+  //     .then((camp: ICampaign) => {
+  //       return Promise.all([
+  //         User.getPerson(camp.createdBy),
+  //         Promise.all(camp.dm.map(dm => User.getPerson(dm)))
+  //       ])
+  //     })
+  // ]);
 
-  if(!campaign) throw CampaignNotFoundErr;
+  const populatedCampaign: IPopulatedCampaign | null = await this.findById(campaignId)
+  .populate({
+    path: 'dm',
+    select: 'username email imageUrl createTime confirmed'
+  })
+  .populate({
+    path: 'playes',
+    select: 'username email imageUrl createTime confirmed'
+  })
+  .populate({
+    path: 'invitedPlayers',
+    select: 'username email imageUrl createTime confirmed'
+  })
+  .populate({
+    path: 'createdBy',
+    select: 'username email imageUrl createTime confirmed'
+  })
 
-  const castCampaign = campaign as ICampaign;
+  if(!populatedCampaign) throw CampaignNotFoundErr;
+
 
   const scaledCampaign: IReactCampaign = {
-    _id: castCampaign._id.toString(),
-    name: castCampaign.name, 
-    createdBy: users[0], 
-    createdOn: castCampaign.createdOn, 
-    description: castCampaign.description, 
-    dm: users[1],
-    handouts: castCampaign.handouts.map(h => h.toString()),
-    game: castCampaign.game,
-    players: users[2],
-    invitedPlayers: users[3],
-    journalEntries: castCampaign.journalEntries.map(j => j.toString()),
-    index: castCampaign.index.map(i => i.toString()),
-    threadId: castCampaign.threadId.toString()
+    _id: populatedCampaign._id.toString(),
+    name: populatedCampaign.name, 
+    createdBy: populatedCampaign.createdBy, 
+    createdOn: populatedCampaign.createdOn, 
+    imageUrl: populatedCampaign.imageUrl,
+    description: populatedCampaign.description, 
+    dm: populatedCampaign.dm,
+    handouts: populatedCampaign.handouts.map(h => h.toString()),
+    game: populatedCampaign.game,
+    players: populatedCampaign.players,
+    invitedPlayers: populatedCampaign.invitedPlayers,
+    journalEntries: populatedCampaign.journalEntries.map(j => j.toString()),
+    index: populatedCampaign.index.map(i => i.toString()),
+    threadId: populatedCampaign.threadId.toString()
   }
 
   console.log({scaledCampaign})
