@@ -17,6 +17,7 @@ export interface IThread {
     lastRead: Date,
     user: mongoose.Types.ObjectId
   }],
+  imageUrl?: string,
   chatType: typeof THREAD_CHAT_TYPES_ARRAY[number],
   campaignId?: mongoose.Types.ObjectId,
   name?: string
@@ -67,7 +68,7 @@ const ThreadSchema = new mongoose.Schema<IThread, ThreadModel, IThreadMethods>({
   }
 })
 
-
+// back reference
 ThreadSchema.virtual('messages', {
   ref: "Message",
   localField: "_id",
@@ -93,6 +94,7 @@ export type RequiredThreadValues = {
 export type IReactThread = {
   threadId: string,
   name: string,
+  imageUrl: string,
   chatType: ChatTypes,
   participants: Array<IPerson>,
   messages: Array<IReactMessage>
@@ -109,7 +111,11 @@ export type IPopulatedThread = Omit<IThread, 'participants'> & {
       imageUrl: string 
     }
   }],
-  messages: [IMessage & IMessageMethods]
+  messages: [IMessage & IMessageMethods],
+  campaign?: {
+    name: string,
+    imageUrl: string
+  }
 }
 
 
@@ -167,6 +173,24 @@ ThreadSchema.static('getThreadsFor', async function getThreadsFor(userId: string
 })
 
 
+function getImageUrl(thread: IPopulatedThread, userId: string): string { 
+  if (thread.imageUrl) return thread.imageUrl;
+  else if (thread.chatType === "CHAT") {
+    const otherParticipants = thread.participants.filter(part => part.user._id.toString() != userId);
+    const otherParticipant = otherParticipants[0];
+    return otherParticipant.user.imageUrl;
+  } 
+  // else if (thread.chatType === "ROOM") {
+
+  // } 
+  else if (thread.chatType === "CAMPAIGN") {
+    if (thread.campaign?.imageUrl) return thread.campaign?.imageUrl;
+  }
+  // else
+  return "./sample.jpg";
+  
+}
+
 ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(userId: string): Promise<Array<IReactThread>> {
   await mongooseConnect();
 
@@ -180,15 +204,21 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
   .populate({
     path: 'participants.user',
     select: 'username email imageUrl createTime confirmed'
+  })
+  .populate({
+    path: 'campaign',
+    select: 'imageUrl'
   });
 
-  console.log("threads", JSON.stringify(threads, null, 2));
+  // console.log("threads", JSON.stringify(threads, null, 2));
 
 
-  const sanitizedThreads = threads.map(t => {
+  const sanitizedThreads: IReactThread[] = threads.map(t => {
 
     const otherParticipants = t.participants.filter(part => part.user._id.toString() != userId);
     const otherParticipant = otherParticipants[0];
+
+    
 
     return {
       userId,
@@ -196,7 +226,7 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
       name: t.name ? t.name : otherParticipant.user.username,
       otherParticipant,
       chatType: t.chatType,
-      // imageUrl: otherParticipant.imageUrl,
+      imageUrl: getImageUrl(t, userId),
       participants: t.participants.map(participant => {
         return {
           _id: participant.user._id.toString(),
@@ -267,11 +297,13 @@ ThreadSchema.static('getThread', async function getThread(threadId: string, user
       return new Date(a.sendTime).getTime() - new Date(b.sendTime).getTime()
     });
 
+    const imageUrl = getImageUrl(thread, userId);
+
     return {
       threadId: thread._id.toString(),
       name: thread.name ? thread.name : otherParticipant.user.username,
       chatType: thread.chatType,
-      // imageUrl: otherParticipant.imageUrl,
+      imageUrl: imageUrl,
       participants: thread.participants.map(participant => {
         return {
           _id: participant.user._id.toString(),
