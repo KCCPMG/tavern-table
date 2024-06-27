@@ -33,7 +33,7 @@ export async function createCampaign(createObj : CreateCampaignProps) : Promise<
       name,
       createdBy: creatorId,
       description: createObj.description || null,
-      dm: [{user: creatorId}],
+      dm: [creatorId],
       game: createObj.game || null, 
       invitedPlayers: createObj.invitedPlayers || [], 
       threadId: thread._id

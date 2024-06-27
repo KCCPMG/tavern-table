@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
-import User, { IPerson } from "./User";
+import User, { IPerson, IPersonUnsanitized } from "./User";
 import { CampaignNotFoundErr } from "@/lib/NextError";
+import mongooseConnect from "@/lib/mongooseConnect";
 
 export interface ICampaign {
   _id: mongoose.Types.ObjectId,
@@ -61,11 +62,8 @@ const CampaignSchema = new mongoose.Schema<ICampaign, CampaignModel, ICampaignMe
     required: false
   },
   dm: [{
-    _id: false,
-    user: {
-      type: mongoose.Types.ObjectId,
-      ref: "User"
-    }
+    type: mongoose.Types.ObjectId,
+    ref: "User"
   }],
   handouts: {
     type: [mongoose.Types.ObjectId]
@@ -74,20 +72,14 @@ const CampaignSchema = new mongoose.Schema<ICampaign, CampaignModel, ICampaignMe
     type: String,
     required: false
   },
-  players:  [{
-    _id: false,
-    user: {
-      type: mongoose.Types.ObjectId,
-      ref: "User"
-    }
-  }],
-  invitedPlayers:  [{
-    _id: false,
-    user: {
-      type: mongoose.Types.ObjectId,
-      ref: "User"
-    }
-  }],
+  players: {
+    type: [mongoose.Types.ObjectId],
+    ref: "User"
+  },
+  invitedPlayers: {
+    type: [mongoose.Types.ObjectId],
+    ref: "User"
+  },
   journalEntries: {
     type: [mongoose.Types.ObjectId],
     default: []
@@ -125,54 +117,82 @@ export type IReactCampaign = {
 
 
 export type IPopulatedCampaign = Omit<ICampaign, 'createdBy' | 'dm' | 'players' | 'invitedPlayers'> & {
-  createdBy: IPerson,
-  dm: IPerson[],
-  players: IPerson[],
-  invitedPlayers: IPerson[]
+  createdBy: IPersonUnsanitized,
+  dm: IPersonUnsanitized[],
+  players: IPersonUnsanitized[],
+  invitedPlayers: IPersonUnsanitized[]
 
 }
 
+
+
+function sanitizeIPerson(unsanitized : IPersonUnsanitized): IPerson {
+  const {username, email, imageUrl} = unsanitized;
+  return {
+    username, 
+    email, 
+    imageUrl, 
+    _id: unsanitized._id.toString()
+  }
+}
+
 CampaignSchema.static('getIReactCampaign', async function getIReactCampaign(campaignId : string) : Promise<IReactCampaign> {
+  await mongooseConnect();
+
+  console.log("Hello, I'm looking for campaign id ", campaignId);
+  const placeholderCampaign = await this.findById(campaignId);
+  console.log({placeholderCampaign});
 
   const populatedCampaign: IPopulatedCampaign | null = await this.findById(campaignId)
+  .populate({path: 'createdBy', select: '_id username email imageUrl'})
   .populate({
     path: 'dm',
-    select: 'username email imageUrl createTime confirmed'
+    select: 'username email imageUrl'
   })
   .populate({
-    path: 'playes',
-    select: 'username email imageUrl createTime confirmed'
+    path: 'players',
+    select: 'username email imageUrl'
   })
   .populate({
     path: 'invitedPlayers',
-    select: 'username email imageUrl createTime confirmed'
+    select: 'username email imageUrl'
   })
-  .populate({
-    path: 'createdBy',
-    select: 'username email imageUrl createTime confirmed'
-  })
+  // .exec();
+
+  // const populatedCampaign: IPopulatedCampaign | null = await this.findById(campaignId).populate(['createdBy', 'dm', 'players', 'invitedPlayers'])
 
   if(!populatedCampaign) throw CampaignNotFoundErr;
+
+  populatedCampaign.dm = populatedCampaign.dm.map(dm => {
+    return {
+      _id: dm._id,
+      username: dm.username,
+      email: dm.email,
+      imageUrl: dm.imageUrl
+    }
+  })
+
+  console.log("\npopulatedCampaign:\n", JSON.stringify(populatedCampaign, null, 2));
 
 
   const scaledCampaign: IReactCampaign = {
     _id: populatedCampaign._id.toString(),
     name: populatedCampaign.name, 
-    createdBy: populatedCampaign.createdBy, 
+    createdBy: sanitizeIPerson(populatedCampaign.createdBy), 
     createdOn: populatedCampaign.createdOn, 
     imageUrl: populatedCampaign.imageUrl,
     description: populatedCampaign.description, 
-    dm: populatedCampaign.dm,
+    dm: populatedCampaign.dm.map(unsanitized => sanitizeIPerson(unsanitized)),
     handouts: populatedCampaign.handouts.map(h => h.toString()),
     game: populatedCampaign.game,
-    players: populatedCampaign.players,
-    invitedPlayers: populatedCampaign.invitedPlayers,
+    players: populatedCampaign.players.map(unsanitized => sanitizeIPerson(unsanitized)),
+    invitedPlayers: populatedCampaign.invitedPlayers.map(unsanitized => sanitizeIPerson(unsanitized)),
     journalEntries: populatedCampaign.journalEntries.map(j => j.toString()),
     index: populatedCampaign.index.map(i => i.toString()),
     threadId: populatedCampaign.threadId.toString()
   }
 
-  console.log({scaledCampaign})
+  console.log("scaledCampaign:\n", JSON.stringify(scaledCampaign, null, 2));
 
   return scaledCampaign;
 })
