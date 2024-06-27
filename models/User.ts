@@ -29,6 +29,13 @@ export interface IUser {
   friends: Array<mongoose.Types.ObjectId>
 }
 
+export interface IPersonUnsanitized{
+  _id: mongoose.Types.ObjectId,
+  username: string,
+  email: string,
+  imageUrl: string
+}
+
 // A limited user to be returned by a search
 export interface IPerson {
   _id: string,
