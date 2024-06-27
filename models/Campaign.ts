@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import User, { IPerson, IPersonUnsanitized } from "./User";
+import { IPerson, IPersonUnsanitized, sanitizeIPerson } from "./User";
 import { CampaignNotFoundErr } from "@/lib/NextError";
 import mongooseConnect from "@/lib/mongooseConnect";
 
@@ -62,7 +62,7 @@ const CampaignSchema = new mongoose.Schema<ICampaign, CampaignModel, ICampaignMe
     required: false
   },
   dm: [{
-    type: mongoose.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User"
   }],
   handouts: {
@@ -126,28 +126,15 @@ export type IPopulatedCampaign = Omit<ICampaign, 'createdBy' | 'dm' | 'players' 
 
 
 
-function sanitizeIPerson(unsanitized : IPersonUnsanitized): IPerson {
-  const {username, email, imageUrl} = unsanitized;
-  return {
-    username, 
-    email, 
-    imageUrl, 
-    _id: unsanitized._id.toString()
-  }
-}
 
 CampaignSchema.static('getIReactCampaign', async function getIReactCampaign(campaignId : string) : Promise<IReactCampaign> {
   await mongooseConnect();
-
-  console.log("Hello, I'm looking for campaign id ", campaignId);
-  const placeholderCampaign = await this.findById(campaignId);
-  console.log({placeholderCampaign});
 
   const populatedCampaign: IPopulatedCampaign | null = await this.findById(campaignId)
   .populate({path: 'createdBy', select: '_id username email imageUrl'})
   .populate({
     path: 'dm',
-    select: 'username email imageUrl'
+    select: '_id username email imageUrl'
   })
   .populate({
     path: 'players',
@@ -157,23 +144,8 @@ CampaignSchema.static('getIReactCampaign', async function getIReactCampaign(camp
     path: 'invitedPlayers',
     select: 'username email imageUrl'
   })
-  // .exec();
-
-  // const populatedCampaign: IPopulatedCampaign | null = await this.findById(campaignId).populate(['createdBy', 'dm', 'players', 'invitedPlayers'])
 
   if(!populatedCampaign) throw CampaignNotFoundErr;
-
-  populatedCampaign.dm = populatedCampaign.dm.map(dm => {
-    return {
-      _id: dm._id,
-      username: dm.username,
-      email: dm.email,
-      imageUrl: dm.imageUrl
-    }
-  })
-
-  console.log("\npopulatedCampaign:\n", JSON.stringify(populatedCampaign, null, 2));
-
 
   const scaledCampaign: IReactCampaign = {
     _id: populatedCampaign._id.toString(),
@@ -191,8 +163,6 @@ CampaignSchema.static('getIReactCampaign', async function getIReactCampaign(camp
     index: populatedCampaign.index.map(i => i.toString()),
     threadId: populatedCampaign.threadId.toString()
   }
-
-  console.log("scaledCampaign:\n", JSON.stringify(scaledCampaign, null, 2));
 
   return scaledCampaign;
 })

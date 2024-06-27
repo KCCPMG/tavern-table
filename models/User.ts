@@ -36,6 +36,17 @@ export interface IPersonUnsanitized{
   imageUrl: string
 }
 
+
+export function sanitizeIPerson(unsanitized : IPersonUnsanitized): IPerson {
+  const {username, email, imageUrl} = unsanitized;
+  return {
+    username, 
+    email, 
+    imageUrl, 
+    _id: unsanitized._id.toString()
+  }
+}
+
 // A limited user to be returned by a search
 export interface IPerson {
   _id: string,
