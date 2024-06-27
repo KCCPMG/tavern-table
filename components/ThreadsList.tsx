@@ -13,8 +13,6 @@ type ThreadsListProps = {
 
 export default function ThreadsList({initThreads, userId}: ThreadsListProps) {
 
-
-
   console.log(initThreads);
 
   return (
@@ -38,26 +36,35 @@ export default function ThreadsList({initThreads, userId}: ThreadsListProps) {
         console.log(imageUrlArr);
 
         return (
-          <li key={it.threadId}>
+          <li className="p-1 border" key={it.threadId}>
             <Link href={`/threads/${it.threadId}`}>
-              <h5>{it.name}</h5>
-              {it.messages[0] && 
-                <>
-                  <div>
-                    {
-                      imageUrlArr.map(url => {
-                        return <img key={new Date().toDateString()} src={url} />
-                      })
-                    }
-                  </div>
-                  <div>
-                    <p>{it.messages[0].text}</p>
-                    <p>
-                      {new Date(it.messages[0].sendTime).toLocaleString()}
-                    </p>
-                  </div>
-                </>
-              }
+              <div className="relative">
+                {
+                  imageUrlArr.map(url => {
+                    return (
+                      <img 
+                        width="70"
+                        height="70"
+                        className="inline-block m-2 relative top-0"
+                        key={new Date().toDateString()} 
+                        src={url} 
+                      />
+                    );
+                  })
+                }
+                <div className="inline-block">
+                  <h5>{it.name}</h5>
+                  {it.messages[0] && 
+                    <div>
+                      <p>{it.messages[0].text}</p>
+                      <p>
+                        {new Date(it.messages[0].sendTime).toLocaleString()}
+                      </p>
+                    </div>
+                  }
+                </div>
+              </div>
+              
             </Link>
           </li>
         )
