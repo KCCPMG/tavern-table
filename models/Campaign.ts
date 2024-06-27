@@ -53,7 +53,8 @@ const CampaignSchema = new mongoose.Schema<ICampaign, CampaignModel, ICampaignMe
   },
   imageUrl: {
     type: String,
-    required: true
+    required: true,
+    default: "/sample.jpg"
   },
   description: {
     type: String,
@@ -132,17 +133,6 @@ export type IPopulatedCampaign = Omit<ICampaign, 'createdBy' | 'dm' | 'players' 
 }
 
 CampaignSchema.static('getIReactCampaign', async function getIReactCampaign(campaignId : string) : Promise<IReactCampaign> {
-  
-  // const [campaign, users] = await Promise.all([
-  //   this.findById(campaignId),
-  //   this.findById(campaignId)
-  //     .then((camp: ICampaign) => {
-  //       return Promise.all([
-  //         User.getPerson(camp.createdBy),
-  //         Promise.all(camp.dm.map(dm => User.getPerson(dm)))
-  //       ])
-  //     })
-  // ]);
 
   const populatedCampaign: IPopulatedCampaign | null = await this.findById(campaignId)
   .populate({

@@ -91,7 +91,9 @@ describe("A campaign", function() {
     expect(newCampaign.name).toBe(sampleCampaignDetails.name);
     expect(newCampaign.createdBy).toBe(sampleUser._id);
     expect(newCampaign.description).toBe(null);
-    expect(newCampaign.dm).toEqual([sampleUser._id]);
+    expect(newCampaign.dm instanceof Array).toBe(true);
+    expect(newCampaign.dm.length).toBe(1);
+    expect(newCampaign.dm[0].user.toString()).toBe(sampleUser._id.toString());
     expect(newCampaign.game).toBe(null);
     expect(newCampaign.invitedPlayers).toEqual([]);
 
