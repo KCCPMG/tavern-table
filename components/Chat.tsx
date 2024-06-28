@@ -35,6 +35,7 @@ export default function Chat({initThread, userId}: ChatProps) {
 
           return (
             <div 
+              key={hm._id}
               className={`
                 border
                 w-5/6

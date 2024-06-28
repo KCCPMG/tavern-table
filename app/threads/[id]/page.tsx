@@ -19,7 +19,7 @@ type PageProps = {
 export default async function Page({params}: PageProps ) {
 
   const session = await getServerSession(authOptions);
-  console.log({"session.user": session?.user})
+  // console.log({"session.user": session?.user})
   if (!(session?.user._id)) return (
     <ToastRedirect 
       toasts={[
