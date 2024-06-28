@@ -26,11 +26,12 @@ async function run() {
   console.log("Connected to mongoose");
 
   // script
-  const campaigns = await Campaign.find({imageUrl: null});
+  const campaigns = await Campaign.find({imageUrl: "localhost:3000/sample.jpg"});
   console.log(campaigns);
-  const campaignPromises = campaigns.map(campaign => new Promise((res, rej) => {
-    campaign.imageUrl = "localhost:3000/sample.jpg";
-    campaign.save();
+  const campaignPromises = campaigns.map(campaign => new Promise<void>( async (res, rej) => {
+    campaign.imageUrl = "http://localhost:3000/sample.jpg";
+    await campaign.save();
+    res();
   }))
   console.log(campaignPromises);
   await Promise.all(campaignPromises);
