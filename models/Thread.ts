@@ -19,7 +19,7 @@ export interface IThread {
   }],
   imageUrl?: string,
   chatType: typeof THREAD_CHAT_TYPES_ARRAY[number],
-  campaignId?: mongoose.Types.ObjectId,
+  campaign?: mongoose.Types.ObjectId,
   name?: string
 }
 
@@ -58,10 +58,11 @@ const ThreadSchema = new mongoose.Schema<IThread, ThreadModel, IThreadMethods>({
     required: true,
     enum: Object.values(THREAD_CHAT_TYPES)
   },
-  campaignId: {
-    required: false,
-    type: mongoose.Types.ObjectId
-  },
+  // campaign: {
+  //   required: false,
+  //   type: mongoose.Types.ObjectId,
+  //   ref: "Campaign"
+  // },
   name: {
     type: String,
     required: false
@@ -73,6 +74,12 @@ ThreadSchema.virtual('messages', {
   ref: "Message",
   localField: "_id",
   foreignField: "threadIds"
+})
+
+ThreadSchema.virtual('campaign', {
+  ref: "Campaign",
+  localField: "_id",
+  foreignField: "threadId"
 })
 
 ThreadSchema.set('toJSON', {virtuals: true});
@@ -112,10 +119,10 @@ export type IPopulatedThread = Omit<IThread, 'participants'> & {
     }
   }],
   messages: [IMessage & IMessageMethods],
-  campaign?: {
+  campaign: {
     name: string,
     imageUrl: string
-  }
+  }[]
 }
 
 
@@ -174,6 +181,9 @@ ThreadSchema.static('getThreadsFor', async function getThreadsFor(userId: string
 
 
 function getImageUrl(thread: IPopulatedThread, userId: string): string { 
+
+  console.log("\ngetImageUrl:\n", thread);
+
   if (thread.imageUrl) return thread.imageUrl;
   else if (thread.chatType === "CHAT") {
     const otherParticipants = thread.participants.filter(part => part.user._id.toString() != userId);
@@ -184,7 +194,7 @@ function getImageUrl(thread: IPopulatedThread, userId: string): string {
 
   // } 
   else if (thread.chatType === "CAMPAIGN") {
-    if (thread.campaign?.imageUrl) return thread.campaign?.imageUrl;
+    if (thread.campaign[0]) return thread.campaign[0].imageUrl;
   }
   // else
   return "./sample.jpg";
@@ -207,10 +217,9 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
   })
   .populate({
     path: 'campaign',
-    select: 'imageUrl'
+    select: 'name imageUrl'
   });
 
-  // console.log("threads", JSON.stringify(threads, null, 2));
 
 
   const sanitizedThreads: IReactThread[] = threads.map(t => {
@@ -218,7 +227,8 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
     const otherParticipants = t.participants.filter(part => part.user._id.toString() != userId);
     const otherParticipant = otherParticipants[0];
 
-    
+    const imageUrl = getImageUrl(t, userId);
+    console.log({imageUrl});
 
     return {
       userId,
@@ -241,15 +251,10 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
           _id: message._id.toString(),
           sender: message.sender.toString(),
           // directRecipient: message.directRecipient?.toString() || undefined,
-          // campaignId: message.campaignId?.toString() || undefined,
           threadIds: message.threadIds.map(tId => tId.toString()),
           sendTime: message.sendTime,
           messageType: message.messageType,
           text: message.text,
-          // response: message.response ? {
-          //   messageId: message.response.messageId,
-          //   messageType: message.response.messageType
-          // } : undefined
         }
         // convert optional fields
         if (message.directRecipient) {
@@ -272,8 +277,8 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
   })
 
   return sanitizedThreads;
-
 })
+
 
 ThreadSchema.static('getThread', async function getThread(threadId: string, userId: string): Promise<IReactThread> {
   try {
@@ -285,6 +290,10 @@ ThreadSchema.static('getThread', async function getThread(threadId: string, user
     .populate({
       path: 'participants.user',
       select: 'username email imageUrl createTime confirmed'
+    })
+    .populate({
+      path: 'campaign',
+      select: 'name imageUrl'
     });
 
     if (!thread) throw ThreadNotFoundErr;
@@ -313,20 +322,15 @@ ThreadSchema.static('getThread', async function getThread(threadId: string, user
         }
       }),
       messages: thread.messages.map(message => {
+
         // convert necessary fields
         const sanitizedMessage: IReactMessage =  {
           _id: message._id.toString(),
           sender: message.sender.toString(),
-          // directRecipient: message.directRecipient?.toString() || undefined,
-          // campaignId: message.campaignId?.toString() || undefined,
           threadIds: message.threadIds.map(tId => tId.toString()),
           sendTime: message.sendTime,
           messageType: message.messageType,
           text: message.text,
-          // response: message.response ? {
-          //   messageId: message.response.messageId,
-          //   messageType: message.response.messageType
-          // } : undefined
         }
         // convert optional fields
         if (message.directRecipient) {
