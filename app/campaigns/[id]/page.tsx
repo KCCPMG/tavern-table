@@ -21,7 +21,6 @@ export default async function Page( { params } : PageProps ) {
   const campaign = await (async () => {
     try {
       const tryCampaign = await Campaign.getIReactCampaign(params.id);
-      console.log(tryCampaign);
       return tryCampaign;
     } catch(err) {
       return null;
@@ -42,7 +41,20 @@ export default async function Page( { params } : PageProps ) {
   }
 
   // check user permission to see campaign
-  if (campaign.dm)
+  const permittedUsers = campaign.dm.concat(campaign.players);
+
+  if (permittedUsers.find(person => person._id !== session.user._id)) {
+    return (
+      <ToastRedirect 
+        toasts={[
+          {
+            message: "You are not permitted to view this campaign",
+            status: "error"
+          }
+        ]}  
+        redirect="/campaigns"  
+      />)
+  }
 
 
 
