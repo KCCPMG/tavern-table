@@ -1,4 +1,4 @@
-import User, { IUser } from "@/models/User";
+// import User, { IUser } from "@/models/User";
 import Campaign from "@/models//Campaign";
 import { DEFAULT_IMAGES } from "@/models/constants";
 import dotenv from "dotenv";
@@ -26,12 +26,13 @@ async function run() {
   console.log("Connected to mongoose");
 
   // script
-
   const campaigns = await Campaign.find({imageUrl: null});
-  const campaignPromises = campaigns.map(campaign => {
-    campaign.imageUrl = "/sample.jpg";
+  console.log(campaigns);
+  const campaignPromises = campaigns.map(campaign => new Promise((res, rej) => {
+    campaign.imageUrl = "localhost:3000/sample.jpg";
     campaign.save();
-  })
+  }))
+  console.log(campaignPromises);
   await Promise.all(campaignPromises);
 
   // const users = await User.find({});
