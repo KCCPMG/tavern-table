@@ -55,7 +55,7 @@ const CampaignSchema = new mongoose.Schema<ICampaign, CampaignModel, ICampaignMe
   imageUrl: {
     type: String,
     required: true,
-    default: "/sample.jpg"
+    default: "localhost:3000/sample.jpg"
   },
   description: {
     type: String,
