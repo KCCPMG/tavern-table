@@ -30,7 +30,7 @@ export interface IThreadMethods {
 
 // create a new model that incorporates IThreadMethods, declare static methods
 export interface ThreadModel extends mongoose.Model<IThread, {}, IThreadMethods> {
-  findOrCreateThreadId({ threadId, participants, chatType }: findOrCreateThreadIdObj ): Promise<IThread>,
+  findOrCreateThreadId({ threadId, participants, chatType }: findOrCreateThreadIdObj ): Promise<string>,
   getThreadsFor(userId: string): Promise<IThread>,
   getThreadPreviewsFor(userId: string): Promise<Array<IReactThread>>,
   getThread(threadId: string, userId: string): Promise<IReactThread>
@@ -167,7 +167,7 @@ ThreadSchema.static('findOrCreateThreadId', async function findOrCreateThread(
     return newThread._id.toString();
 
   } catch(err) {
-    console.log(err);
+    console.log("\n\nfindOrCreateThread - err:\n", err);
     throw err;
   }
 })
@@ -181,8 +181,6 @@ ThreadSchema.static('getThreadsFor', async function getThreadsFor(userId: string
 
 
 function getImageUrl(thread: IPopulatedThread, userId: string): string { 
-
-  console.log("\ngetImageUrl:\n", thread);
 
   if (thread.imageUrl) return thread.imageUrl;
   else if (thread.chatType === "CHAT") {
