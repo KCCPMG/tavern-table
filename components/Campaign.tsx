@@ -39,8 +39,8 @@ function InviteMessageModal(
   return (
     <form onSubmit={sendInvitation}>
       <h4>Invite {player.username} to {campaignName}</h4>
-      <textarea rows={4} onChange={handleTextChange}></textarea>
-      <div>
+      <textarea className="border" rows={4} cols={40} onChange={handleTextChange}/>
+      <div className="justify-around">
         <button onClick={cancelInvitation}>Cancel</button>
         <button>Invite!</button>
       </div>
@@ -95,7 +95,7 @@ function InvitePlayersModal({ campaignName, campaignId }: InvitePlayersModalProp
   }, [searchVal]);
 
   return (
-    <form>
+    <>
       <label>Search by username or email</label>
       <input 
         type="text" 
@@ -124,7 +124,7 @@ function InvitePlayersModal({ campaignName, campaignId }: InvitePlayersModalProp
           </div>
         )
       })}
-    </form>
+    </>
   )
 }
 
