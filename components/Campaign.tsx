@@ -1,7 +1,7 @@
 "use client";
 
 import { IReactCampaign } from "@/models/Campaign";
-import { MouseEvent, ChangeEventHandler, ChangeEvent, useState, useEffect } from "react";
+import { MouseEvent, FormEvent, ChangeEventHandler, ChangeEvent, useState, useEffect } from "react";
 import { useModalContext } from "context/ModalContext";
 import { IPerson } from "@/models/User";
 
@@ -32,15 +32,26 @@ function InviteMessageModal(
     )
   }
 
-  const sendInvitation = () => {
-    // placeholder action
+  const sendInvitation = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const response = await fetch(`/api/campaigns/${campaignId}/invite`, {
+      method: 'POST',
+      body: JSON.stringify({
+        inviteeId: player._id, 
+        campaignId, 
+        text: messageText
+      })
+    })
+    const json = await response.json();
+    console.log(json);
+    setShowModal(false);
   }
 
   return (
     <form onSubmit={sendInvitation}>
       <h4>Invite {player.username} to {campaignName}</h4>
-      <textarea className="border" rows={4} cols={40} onChange={handleTextChange}/>
-      <div className="justify-around">
+      <textarea className="border" rows={4} cols={32} onChange={handleTextChange}/>
+      <div className="flex justify-around">
         <button onClick={cancelInvitation}>Cancel</button>
         <button>Invite!</button>
       </div>
@@ -53,7 +64,6 @@ type InvitePlayersModalProps = {
   campaignId: string,
   campaignName: string
 }
-
 
 function InvitePlayersModal({ campaignName, campaignId }: InvitePlayersModalProps) {
 
@@ -104,9 +114,9 @@ function InvitePlayersModal({ campaignName, campaignId }: InvitePlayersModalProp
         value={searchVal}
       />
       {foundPersons.map(fp => {
-        console.log(fp);
         return (
           <div 
+          key={fp._id}
             className="cursor-pointer hover:bg-slate-300"
             onClick={(e) => {
               e.preventDefault();
@@ -138,7 +148,7 @@ export default function Campaign({initCampaign} : CampaignProps) {
   const { setShowModal, setModalBody } = useModalContext();
   const [campaign, setCampaign] = useState<IReactCampaign>(initCampaign);
 
-  console.log(initCampaign);
+  // console.log(initCampaign);
 
   const handleInvitePlayersClick = (e: MouseEvent) => {
     e.preventDefault();

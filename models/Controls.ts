@@ -98,8 +98,8 @@ export async function inviteToCampaign(
       sender: user._id,
       directRecipient: invitee._id,
       campaignId: campaign._id,
-      threadIds: [directThread._id, campaign.threadId],
-      sendTime: Date,
+      threadIds: [directThread, campaign.threadId],
+      sendTime: new Date(),
       messageType: MESSAGE_TYPES.CAMPAIGN_INVITE,
       text: text,
     })
