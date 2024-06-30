@@ -283,7 +283,7 @@ ThreadSchema.static('getThread', async function getThread(threadId: string, user
     const thread: IPopulatedThread | null = await this.findById(threadId)
     .populate({
       path: 'messages',
-      select: 'sender sendTime chatType participants text'
+      select: 'sender sendTime messageType chatType participants text'
     })
     .populate({
       path: 'participants.user',
