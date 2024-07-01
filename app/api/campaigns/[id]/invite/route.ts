@@ -6,10 +6,6 @@ import { MustSignInErr } from "@/lib/NextError";
 import { authOptions } from "@/api/auth/[...nextauth]/route";
 
 
-export async function GET() {
-  return Response.json("pissssss");
-}
-
 export async function POST(req: NextRequest, 
   {params}: {params: {id: string}}, res: NextResponse
 ) {
