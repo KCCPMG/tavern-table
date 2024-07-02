@@ -4,6 +4,7 @@ import { IReactThread } from "@/models/Thread";
 import { IReactMessage } from "@/models/Message";
 import { IPerson } from "@/models/User";
 import { MESSAGE_TYPES } from "@/models/constants";
+import { useEffect, useState } from "react";
 
 type IHydratedReactMessage = Omit<IReactMessage, 'sender'| 'directRecipient'> & {
   sender: IPerson | undefined,
@@ -59,17 +60,32 @@ function ChatMessage({ hm, userId }: ChatMessageProps ) {
     hm.messageType === MESSAGE_TYPES.ROOM_INVITE
   )
 
-  const senderIsUserStyle = senderIsUser ? 
-    "float-right" : "float-left"
+  const senderIsUserClassName = (senderIsUser ? "justify-end ml-16 " : "justify-start mr-16")
 
-  const messageIsInvitationStyle = messageIsInvitation ? 
-    "bg-slate-300" : ""
+  return (
 
-  const messageClassName = [
-    'border w-5/6',
-    senderIsUserStyle,
-    messageIsInvitationStyle
-  ].join(" ")
+    <div className="w-full block my-2">
+      <div className={senderIsUserClassName + " border p-1 flex"}>
+        <span>{hm.text}</span>
+      </div>
+      {messageIsInvitation && 
+        <ChatMessageInvitationBar hm={hm} userId={userId} />
+      }
+    </div>
+  )
+
+}
+
+
+
+
+function ChatMessageInvitationBar({hm, userId}: ChatMessageProps) {
+
+  const [campaignName, setCampaignName] = useState("");
+
+  // useEffect(function() {
+  //   fetch(process.env.NEXTAUTH_URL + '')
+  // }, [])
 
 
   function generateInvitationSummaryMessage() {
@@ -84,22 +100,12 @@ function ChatMessage({ hm, userId }: ChatMessageProps ) {
 
     return inviter + " invited " + invitee + " to join the " + campaignOrGroup
   }
-    // const invitationString = messageIsInvitation ?
-    //   (hm.sender === userId) ? "You" :  :
-    //   ""
 
   return (
-
-    <div 
-      className="w-full block"
-    >
-      <div 
-        className={(senderIsUser ? "justify-end ml-16 " : "justify-start mr-16") + " border p-1 flex my-2"}
-      >
-        <span>{hm.text}</span>
+    <div className="bg-slate-300 w-full p-1">
+      <div className="mx-auto w-fit">
+        <span>{generateInvitationSummaryMessage()}</span>
       </div>
-
     </div>
   )
-
 }
