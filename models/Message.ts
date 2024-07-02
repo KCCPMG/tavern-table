@@ -11,7 +11,7 @@ export interface IMessage {
   sender: mongoose.Types.ObjectId,
   directRecipient?: mongoose.Types.ObjectId,
   campaignId?: mongoose.Types.ObjectId,
-  threadIds: Array<mongoose.Types.ObjectId>,
+  threads: Array<mongoose.Types.ObjectId>,
   sendTime: Date,
   messageType: MessageType,
   text?: string,
@@ -29,7 +29,7 @@ export interface IMessageMethods {
 // create a new model that knows about IMessageMethods, declare static methods
 export interface MessageModel extends mongoose.Model<IMessage, {}, IMessageMethods> {
   createTextMessage(
-    {senderId, recipientId, text, threadId}: createTextMessageObj
+    {senderId, recipientId, text, thread}: createTextMessageObj
   ): Promise<IMessage>,
   getIReactMessage(id: string): Promise<IReactMessage>,
 }
@@ -47,10 +47,10 @@ const MessageSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     required: false
   },
-  threadIds: {
-    type: [mongoose.Types.ObjectId],
-    required: true
-  },
+  threads: [{
+    type: mongoose.Types.ObjectId,
+    ref: "Thread"
+  }],
   sendTime: {
     type: Date,
     required: true,
@@ -86,7 +86,7 @@ export type IReactMessage = {
   sender: string,
   directRecipient?: string,
   campaignId?: string,
-  threadIds: Array<string>,
+  threads: Array<string>,
   sendTime: Date,
   messageType: MessageType
   text?: string,
@@ -101,7 +101,7 @@ export type ResponseMessageType = typeof RESPONSE_MESSAGE_TYPE_ARR[number];
 
 export type RequiredMessageValues = {
   sender: mongoose.Types.ObjectId,
-  threadIds: Array<mongoose.Types.ObjectId>,
+  threads: Array<mongoose.Types.ObjectId>,
   messageType: MessageType,
   text: string
 }
@@ -116,7 +116,7 @@ MessageSchema.method('toIReactMessage', function toIReactMessage(): IReactMessag
     sender: this.sender.toString(),
     directRecipient: this.directRecipient?.toString() || undefined,
     campaignId: this.campaignId?.toString() || undefined,
-    threadIds: this.threadIds.map(t => t.toString()),
+    threads: this.threads.map(t => t.toString()),
     sendTime: this.sendTime,
     messageType: this.messageType,
     text: this.text || undefined,
@@ -141,17 +141,17 @@ type createTextMessageObj = {
   senderId: string, 
   recipientId: string, 
   text: string, 
-  threadId?: string
+  thread?: string
 }
 
 // Create and send a regular text message from one user to another
 MessageSchema.static('createTextMessage', async function createTextMessage(
-  {senderId, recipientId, text, threadId}: createTextMessageObj
+  {senderId, recipientId, text, thread}: createTextMessageObj
 ): Promise<IMessage> {
 
   try {
-    const retrievedThreadId = await Thread.findOrCreateThreadId({
-      threadId,
+    const retrievedThread = await Thread.findOrCreateThreadId({
+      threadId: thread,
       participants: [senderId, recipientId],
       chatType: THREAD_CHAT_TYPES.CHAT
     })
@@ -161,7 +161,7 @@ MessageSchema.static('createTextMessage', async function createTextMessage(
       directRecipient: recipientId,
       messageType: MESSAGE_TYPES.TEXT_ONLY,
       text,
-      threadIds: retrievedThreadId
+      threads: retrievedThread
     })
     return message;
 

@@ -15,6 +15,13 @@ export async function GET(req: NextRequest, {params}: {params: {id: string}}){
 
     if (!userId) throw MustSignInErr;
   
+    try {
+      await Thread.getDeeplyPopulatedThread(threadId, userId);
+    } catch(err) {
+      console.log(err);
+    }
+
+
     const thread = await Thread.getThread(threadId, userId);
 
     if ( !(thread.participants.find(p => p._id ===userId)) ) {

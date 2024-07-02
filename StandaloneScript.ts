@@ -1,8 +1,10 @@
-// import User, { IUser } from "@/models/User";
-import Campaign from "@/models//Campaign";
+import mongoose from "mongoose";
+
+import User, { IUser } from "@/models/User";
+// import Campaign from "@/models//Campaign";
+import Thread from "@/models/Thread";
 import { DEFAULT_IMAGES } from "@/models/constants";
 import dotenv from "dotenv";
-import mongoose from "mongoose";
 
 
 async function run() {
@@ -26,15 +28,40 @@ async function run() {
   console.log("Connected to mongoose");
 
   // script
-  const campaigns = await Campaign.find({imageUrl: "localhost:3000/sample.jpg"});
-  console.log(campaigns);
-  const campaignPromises = campaigns.map(campaign => new Promise<void>( async (res, rej) => {
-    campaign.imageUrl = "http://localhost:3000/sample.jpg";
-    await campaign.save();
-    res();
-  }))
-  console.log(campaignPromises);
-  await Promise.all(campaignPromises);
+  const thread = await Thread.findById("66710008b0e8ba321ecc28fd")
+  // .populate({
+  //   path: 'messages',
+  //   select: 'sender sendTime messageType chatType participants text directRecipient',
+  //   // populate: {
+  //   //   path: 'threads',
+  //   //   populate: {
+  //   //     path: 'campaigns'
+  //   //   }
+  //   // }
+  // })
+  .populate({
+    path: 'participants.user',
+    select: 'username email imageUrl createTime confirmed'
+  })
+  .populate({
+    path: 'campaign',
+    select: 'name imageUrl'
+  });
+
+  // const thread = await Thread.getThread("66710008b0e8ba321ecc28fd", "66218e77a64b5f14d174b637");
+
+  console.log(JSON.stringify(thread, null, 2));
+
+
+  // const campaigns = await Campaign.find({imageUrl: "localhost:3000/sample.jpg"});
+  // console.log(campaigns);
+  // const campaignPromises = campaigns.map(campaign => new Promise<void>( async (res, rej) => {
+  //   campaign.imageUrl = "http://localhost:3000/sample.jpg";
+  //   await campaign.save();
+  //   res();
+  // }))
+  // console.log(campaignPromises);
+  // await Promise.all(campaignPromises);
 
   // const users = await User.find({});
   // const userUpdatePromiseArr: Array<Promise<IUser>> = [];

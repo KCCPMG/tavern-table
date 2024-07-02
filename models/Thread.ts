@@ -33,7 +33,8 @@ export interface ThreadModel extends mongoose.Model<IThread, {}, IThreadMethods>
   findOrCreateThreadId({ threadId, participants, chatType }: findOrCreateThreadIdObj ): Promise<string>,
   getThreadsFor(userId: string): Promise<IThread>,
   getThreadPreviewsFor(userId: string): Promise<Array<IReactThread>>,
-  getThread(threadId: string, userId: string): Promise<IReactThread>
+  getThread(threadId: string, userId: string): Promise<IReactThread>,
+  getDeeplyPopulatedThread(threadId: string, userId: string): Promise<void>
 }
 
 
@@ -73,7 +74,7 @@ const ThreadSchema = new mongoose.Schema<IThread, ThreadModel, IThreadMethods>({
 ThreadSchema.virtual('messages', {
   ref: "Message",
   localField: "_id",
-  foreignField: "threadIds"
+  foreignField: "threads"
 })
 
 ThreadSchema.virtual('campaign', {
@@ -355,6 +356,93 @@ ThreadSchema.static('getThread', async function getThread(threadId: string, user
   }
 })
 
+
+
+ThreadSchema.static('getDeeplyPopulatedThread', async function getDeeplyPopulatedThread(threadId: string, userId: string): Promise<void> {
+  try {
+    const thread= await this.findById(threadId)
+    .populate({
+      path: 'messages',
+      select: 'sender sendTime messageType chatType participants text directRecipient threadIds',
+      populate: {
+        path: 'threadIds',
+        populate: {
+          path: 'campaign',
+          select: 'name'
+        }
+      }
+    })
+    .populate({
+      path: 'participants.user',
+      select: 'username email imageUrl createTime confirmed'
+    })
+    .populate({
+      path: 'campaign',
+      select: 'name imageUrl'
+    });
+
+    console.log("Deeply populated thread", JSON.stringify(thread, null, 2))
+
+    // if (!thread) throw ThreadNotFoundErr;
+    // if (!(thread.participants.map(t => t.user._id.toString()).includes(userId))) throw ThreadAccessDeniedErr;
+
+    // const otherParticipants = thread.participants.filter(part => part.user._id.toString() != userId);
+    // const otherParticipant = otherParticipants[0];
+  
+    // thread.messages.sort((a,b) => {
+    //   return new Date(a.sendTime).getTime() - new Date(b.sendTime).getTime()
+    // });
+
+    // const imageUrl = getImageUrl(thread, userId);
+
+    // return {
+    //   threadId: thread._id.toString(),
+    //   name: thread.name ? thread.name : otherParticipant.user.username,
+    //   chatType: thread.chatType,
+    //   imageUrl: imageUrl,
+    //   participants: thread.participants.map(participant => {
+    //     return {
+    //       _id: participant.user._id.toString(),
+    //       username: participant.user.username,
+    //       email: participant.user.email,
+    //       imageUrl: participant.user.imageUrl
+    //     }
+    //   }),
+    //   messages: thread.messages.map(message => {
+
+    //     // convert necessary fields
+    //     const sanitizedMessage: IReactMessage =  {
+    //       _id: message._id.toString(),
+    //       sender: message.sender.toString(),
+    //       threadIds: message.threadIds.map(tId => tId.toString()),
+    //       sendTime: message.sendTime,
+    //       messageType: message.messageType,
+    //       text: message.text,
+    //     }
+    //     // convert optional fields
+    //     if (message.directRecipient) {
+    //       sanitizedMessage.directRecipient = message.directRecipient.toString()
+    //     }
+    //     if (message.campaignId) {
+    //       sanitizedMessage.directRecipient = message.campaignId.toString()
+    //     }
+    //     // message.response is an object, even if undefined will return truthy
+    //     if (message.response?.messageId) {
+    //       sanitizedMessage.response = {
+    //         messageId: message.response.messageId.toString(),
+    //         messageType: message.response.messageType
+    //       }
+    //     }
+
+    //     return sanitizedMessage;
+    //   })
+    // }
+
+
+  } catch(err) {
+    throw err;
+  }
+})
 
 
 export default mongoose.models.Thread as ThreadModel || mongoose.model<IThread, ThreadModel>("Thread", ThreadSchema)
