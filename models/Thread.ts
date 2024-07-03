@@ -220,6 +220,7 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
   });
 
 
+  console.log("\n\getThreadPreviewsFor - threads:", {threads})
 
   const sanitizedThreads: IReactThread[] = threads.map(t => {
 
@@ -250,7 +251,7 @@ ThreadSchema.static('getThreadPreviewsFor', async function getThreadPreviewsFor(
           _id: message._id.toString(),
           sender: message.sender.toString(),
           // directRecipient: message.directRecipient?.toString() || undefined,
-          threadIds: message.threadIds.map(tId => tId.toString()),
+          threads: message.threads.map(thread => thread.toString()),
           sendTime: message.sendTime,
           messageType: message.messageType,
           text: message.text,
@@ -326,7 +327,7 @@ ThreadSchema.static('getThread', async function getThread(threadId: string, user
         const sanitizedMessage: IReactMessage =  {
           _id: message._id.toString(),
           sender: message.sender.toString(),
-          threadIds: message.threadIds.map(tId => tId.toString()),
+          threads: message.threads.map(thread => thread.toString()),
           sendTime: message.sendTime,
           messageType: message.messageType,
           text: message.text,
@@ -365,7 +366,7 @@ ThreadSchema.static('getDeeplyPopulatedThread', async function getDeeplyPopulate
       path: 'messages',
       select: 'sender sendTime messageType chatType participants text directRecipient threadIds',
       populate: {
-        path: 'threadIds',
+        path: 'threads',
         populate: {
           path: 'campaign',
           select: 'name'
